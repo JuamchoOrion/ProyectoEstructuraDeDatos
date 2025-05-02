@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Solicitud de Ayuda Académica</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 50px auto;
+      padding: 2rem;
+      background-color: #fff;
+      border-radius: 25px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+
+    input[type="text"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .btn {
+      background-color: orange;
+      color: white;
+      font-weight: bold;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      margin-top: 2rem;
+      font-size: 1rem;
+      cursor: pointer;
+      display: block;
+      width: 100%;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: darkorange;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Solicitar Ayuda Académica</h2>
+  <form action="/api/ayuda" method="POST">
+    <label for="tema">Tema o materia:</label>
+    <input type="text" id="tema" name="tema" placeholder="Ej: Álgebra lineal, Historia moderna" required>
+
+    <label for="descripcion">Descripción del problema:</label>
+    <textarea id="descripcion" name="descripcion" placeholder="Describe el problema con claridad..." required></textarea>
+
+    <label for="urgencia">Nivel de urgencia:</label>
+    <select id="urgencia" name="urgencia" required>
+      <option value="alta">Alta</option>
+      <option value="media">Media</option>
+      <option value="baja">Baja</option>
+    </select>
+
+    <button type="submit" class="btn">Enviar solicitud</button>
+  </form>
+</div>
+
+</body>
+</html>
