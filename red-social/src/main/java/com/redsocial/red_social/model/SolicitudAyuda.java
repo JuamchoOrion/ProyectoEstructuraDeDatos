@@ -8,6 +8,10 @@ import java.util.Date;
 @Data
 @Table(name = "solicitudAyuda")
 public class SolicitudAyuda implements Comparable<SolicitudAyuda> {
+
+    @Transient
+    private RedSocial redSocial;
+
     @Column(name = "fechaNecesidad")
     private Date fechaNecesidad;
     @Column(name = "peticion")

@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const registroForm = document.getElementById("registroForm");
 
     if (registroForm) {
-        registroForm.addEventListener("submit", function (e) {
+        registroForm.addEventListener("submit", async function (e) {
             e.preventDefault();
 
             const nombre = document.getElementById("nombre").value.trim();
@@ -30,11 +30,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            // Simulación de registro exitoso
-            showAlert("Registro exitoso. Redirigiendo al login...", "success");
-            setTimeout(() => {
-                window.location.href = "/login.html";
-            }, 2000);
+            const response = await fetch("/api/registro", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ nombre, email, password, confirmPassword })
+            });
+
+            const text = await response.text();
+
+            if (response.ok) {
+                showAlert(text, "success");
+                setTimeout(() => {
+                    window.location.href = "/login.html";
+                }, 2000);
+            } else {
+                showAlert(text, "danger");
+            }
         });
     }
 });
@@ -56,3 +69,4 @@ function showAlert(message, type = "info") {
     const formCard = document.querySelector(".card");
     formCard.appendChild(alert);
 }
+

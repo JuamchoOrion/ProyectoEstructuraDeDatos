@@ -8,18 +8,22 @@ import lombok.NoArgsConstructor;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "tipo")
 @Data
-@NoArgsConstructor // Necesario para que JPA instancie la clase
+@NoArgsConstructor
 public abstract class Usuario {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nombre;
-    private String contrasenia;
+    @Column(name = "username", nullable = false, length = 100)
+    private String username;
 
-    public Usuario(String nombre, String contrasenia) {
-        this.nombre = nombre;
-        this.contrasenia = contrasenia;
+    @Column(name = "password", nullable = false)
+    private String password;
+
+    public Usuario(String username, String password) {
+        this.username = username;
+        this.password = password;
     }
 }
+
+

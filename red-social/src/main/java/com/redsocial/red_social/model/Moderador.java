@@ -4,11 +4,11 @@ import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
 @Entity
+@DiscriminatorValue("MODERADOR")
 @NoArgsConstructor // Constructor sin argumentos (requerido por JPA)
 public class Moderador extends Usuario {
-
-    @ManyToOne // Asumiendo que muchos moderadores pueden pertenecer a una RedSocial
-    private RedSocial redSocial;
+    @Transient
+    private RedSocial red_social;
 
     public Moderador(String nombre, String contrasenia) {
         super(nombre, contrasenia);

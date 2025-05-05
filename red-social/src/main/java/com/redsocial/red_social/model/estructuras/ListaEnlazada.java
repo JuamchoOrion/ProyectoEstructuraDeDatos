@@ -3,7 +3,7 @@ package com.redsocial.red_social.model.estructuras;
 
 import java.util.List;
 
-public class ListaEnlazada<T> implements List<T> {
+public class ListaEnlazada<T>  {
     private Nodo<T> cabeza;
     private Nodo<T> cola;
 
