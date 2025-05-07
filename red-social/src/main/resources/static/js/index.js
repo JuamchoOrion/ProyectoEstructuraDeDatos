@@ -5,41 +5,56 @@ document.addEventListener("DOMContentLoaded", () => {
         loginForm.addEventListener("submit", function (e) {
             e.preventDefault();
 
-            const emailInput = document.getElementById("email");
+            const usernameInput = document.getElementById("username");
             const passwordInput = document.getElementById("password");
 
-            const email = emailInput.value.trim();
+            const username = usernameInput.value.trim();
             const password = passwordInput.value.trim();
 
             // Validaciones
-            if (!email || !password) {
+            if (!username || !password) {
                 showAlert("Por favor, completa todos los campos.", "danger");
                 return;
             }
 
-            if (!validateEmail(email)) {
-                showAlert("Por favor, introduce un correo válido.", "warning");
+            if (username.length < 4) {
+                showAlert("El nombre de usuario debe tener al menos 4 caracteres", "warning");
                 return;
             }
 
-            // Aquí podrías hacer una llamada al backend con fetch/AJAX
+            // Llamada al backend
+            fetch("/api/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => { throw new Error(text || 'Credenciales incorrectas') });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    localStorage.setItem("token", data.token);
+                    showAlert("Inicio de sesión exitoso. Redirigiendo...", "success");
 
-            // Simulación de inicio de sesión exitoso
-            showAlert("Inicio de sesión exitoso. Redirigiendo...", "success");
-            setTimeout(() => {
-                window.location.href = "/perfil.html";
-            }, 1500);
+                    setTimeout(() => {
+                        window.location.href = "/homePage.html";
+                    }, 1500);
+                })
+                .catch(error => {
+                    showAlert(error.message || "Error en el inicio de sesión", "danger");
+                    console.error("Error:", error);
+                });
         });
     }
 });
 
-// Validación básica de correo
-function validateEmail(email) {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
-}
-
-// Función para mostrar mensajes tipo alerta de Bootstrap
 function showAlert(message, type = "info") {
     const existingAlert = document.getElementById("login-alert");
     if (existingAlert) existingAlert.remove();
