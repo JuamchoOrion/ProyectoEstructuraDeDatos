@@ -4,45 +4,72 @@ import com.redsocial.red_social.dto.AuthRequest;
 import com.redsocial.red_social.dto.AuthResponse;
 import com.redsocial.red_social.service.EstudianteService;
 import com.redsocial.red_social.util.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
 public class AuthController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+    private final EstudianteService estudianteService;
+    private final JwtUtil jwtUtil;
 
-    @Autowired
-    private EstudianteService estudianteService;
-
-    @Autowired
-    private JwtUtil jwtUtil;
+    public AuthController(AuthenticationManager authenticationManager,
+                          EstudianteService estudianteService,
+                          JwtUtil jwtUtil) {
+        this.authenticationManager = authenticationManager;
+        this.estudianteService = estudianteService;
+        this.jwtUtil = jwtUtil;
+    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest authRequest) {
         try {
-            System.out.println("Password recibido: " + authRequest.getPassword());
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
+                    new UsernamePasswordAuthenticationToken(
+                            authRequest.getUsername(),
+                            authRequest.getPassword()
+                    )
             );
+
+            final UserDetails userDetails = estudianteService.loadUserByUsername(authRequest.getUsername());
+            final String jwt = jwtUtil.generateToken(userDetails);
+
+            return ResponseEntity.ok(new AuthResponse(jwt));
+
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales incorrectas");
         }
+    }
 
-        final UserDetails userDetails = estudianteService.loadUserByUsername(authRequest.getUsername());
-        final String jwt = jwtUtil.generateToken(userDetails);
+    // ✅ NUEVO: Endpoint para verificar el token JWT
+    @GetMapping("/verify")
+    public ResponseEntity<?> verifyToken(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
 
-        return ResponseEntity.ok(new AuthResponse(jwt));
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            try {
+                String username = jwtUtil.extractUsername(token);
+                UserDetails userDetails = estudianteService.loadUserByUsername(username);
+
+                if (jwtUtil.validateToken(token, userDetails)) {
+                    return ResponseEntity.ok().body("Token válido");
+                } else {
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido");
+                }
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No se proporcionó token");
     }
 }

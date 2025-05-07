@@ -2,14 +2,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const loginForm = document.querySelector("form");
 
     if (loginForm) {
-        loginForm.addEventListener("submit", function (e) {
+        loginForm.addEventListener("submit", async function (e) {
             e.preventDefault();
 
-            const usernameInput = document.getElementById("username");
-            const passwordInput = document.getElementById("password");
-
-            const username = usernameInput.value.trim();
-            const password = passwordInput.value.trim();
+            const username = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value.trim();
 
             // Validaciones
             if (!username || !password) {
@@ -22,39 +19,37 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            // Llamada al backend
-            fetch("/api/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    username: username,
-                    password: password
-                })
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.text().then(text => { throw new Error(text || 'Credenciales incorrectas') });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    localStorage.setItem("token", data.token);
-                    showAlert("Inicio de sesión exitoso. Redirigiendo...", "success");
-
-                    setTimeout(() => {
-                        window.location.href = "/homePage.html";
-                    }, 1500);
-                })
-                .catch(error => {
-                    showAlert(error.message || "Error en el inicio de sesión", "danger");
-                    console.error("Error:", error);
+            try {
+                const response = await fetch("/api/login", {
+                    method: "POST",
+                    credentials: 'include', // Importante para cookies
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ username, password })
                 });
+
+                if (!response.ok) {
+                    const error = await response.text();
+                    throw new Error(error || "Credenciales incorrectas");
+                }
+
+                const data = await response.json();
+                console.log("Login exitoso. Token recibido:", data.jwt);  // Log aquí
+                localStorage.setItem("token", "Bearer " + data.jwt);
+                console.log(localStorage.getItem("token"));
+                showAlert("Inicio de sesión exitoso. Redirigiendo...", "success");
+
+                setTimeout(() => {
+                    window.location.href = "/perfil.html";
+                }, 1500);
+            } catch (error) {
+                showAlert(error.message || "Error en el inicio de sesión", "danger");
+                console.error("Error:", error);
+            }
         });
     }
 });
-
 function showAlert(message, type = "info") {
     const existingAlert = document.getElementById("login-alert");
     if (existingAlert) existingAlert.remove();

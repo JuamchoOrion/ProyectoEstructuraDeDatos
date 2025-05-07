@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 public class Moderador extends Usuario {
     @Transient
     private RedSocial red_social;
-    public Moderador(String nombre, String contrasenia) {
-        super(nombre, contrasenia);
+    public Moderador(String nombre, String contrasenia, String email) {
+        super(nombre, contrasenia, email);
     }
 }

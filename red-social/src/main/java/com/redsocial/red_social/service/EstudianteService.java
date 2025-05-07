@@ -30,4 +30,8 @@ public class EstudianteService implements UserDetailsService {
                 new ArrayList<>()
         );
     }
+    public Usuario obtenerPerfilUsuario(String username) {
+        return estudianteRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+    }
 }

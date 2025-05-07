@@ -20,10 +20,13 @@ public abstract class Usuario {
 
     @Column(name = "password", nullable = false)
     private String password;
+    @Column(name = "email", nullable = false)
+    private String email;
 
-    public Usuario(String username, String password) {
+    public Usuario(String username, String password,String email) {
         this.username = username;
         this.password = password;
+        this.email = email;
     }
 }
 

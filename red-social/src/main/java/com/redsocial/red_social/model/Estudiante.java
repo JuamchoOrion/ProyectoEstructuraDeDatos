@@ -15,8 +15,6 @@ import java.util.List;
 @Setter
 public class Estudiante extends Usuario {
 
-    @Column(name = "email")
-    private String email;
 
     @ManyToMany
     @JoinTable(
@@ -42,8 +40,7 @@ public class Estudiante extends Usuario {
     private ListaEnlazada<Chat> chats = new ListaEnlazada<>();
 
     public Estudiante(String username, String email, String password) {
-        super(username, password);
-        this.email = email;
+        super(username, password,email);
     }
 
     public void publicarContenido(Contenido contenido) {
