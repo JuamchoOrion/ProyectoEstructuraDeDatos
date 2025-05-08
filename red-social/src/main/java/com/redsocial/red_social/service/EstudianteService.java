@@ -14,12 +14,12 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 
 @Service
-public class EstudianteService implements UserDetailsService {
+public class EstudianteService  {
     @Autowired
     private EstudianteRepository estudianteRepository;
     @Autowired  // ¡Asegúrate que esté inyectado!
     private PasswordEncoder passwordEncoder;
-    @Override
+
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Usuario usuario = estudianteRepository.findByUsername(username) // Busca en usuario
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));

@@ -1,6 +1,7 @@
 package com.redsocial.red_social.config;
 
 import com.redsocial.red_social.filter.JwtRequestFilter;
+import com.redsocial.red_social.service.CustomUserDetailService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,9 +25,11 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtRequestFilter jwtRequestFilter;
+    private final CustomUserDetailService userDetailsService;
 
-    public SecurityConfig(JwtRequestFilter jwtRequestFilter) {
+    public SecurityConfig(JwtRequestFilter jwtRequestFilter, CustomUserDetailService userDetailsService) {
         this.jwtRequestFilter = jwtRequestFilter;
+        this.userDetailsService = userDetailsService;
     }
 
     @Bean
@@ -40,7 +43,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/verify").permitAll()
                         .requestMatchers(
                                 "/", "/index.html", "/login.html", "/registro.html", "/perfil.html",
-                                "/css/**", "/js/**", "/images/**", "/styles.css", "/favicon.ico","/api/registro"
+                                "/css/**", "/js/**", "/images/**", "/styles.css", "/favicon.ico","/api/registro","/registroModeradores.html", "/api/moderadores/registro"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

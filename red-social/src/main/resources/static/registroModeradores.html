@@ -1,0 +1,63 @@
+<!-- FORMULARIO HTML CORREGIDO -->
+<form id="registroModeradorForm">
+  <div class="mb-3">
+    <label for="nombre" class="form-label">Nombre</label>
+    <input type="text" class="form-control" id="nombre" placeholder="Tu nombre completo" required />
+  </div>
+  <div class="mb-3">
+    <label for="correo" class="form-label">Correo electrónico</label>
+    <input type="email" class="form-control" id="correo" placeholder="nombre@ejemplo.com" required />
+  </div>
+  <div class="mb-3">
+    <label for="contrasena" class="form-label">Contraseña</label>
+    <input type="password" class="form-control" id="contrasena" placeholder="Ingresa una contraseña" required />
+  </div>
+  <div class="mb-3">
+    <label for="confirmarContrasena" class="form-label">Confirmar Contraseña</label>
+    <input type="password" class="form-control" id="confirmarContrasena" placeholder="Repite tu contraseña" required />
+  </div>
+  <button type="submit" class="btn btn-primary w-100">Registrarse</button>
+</form>
+<script>
+  document.getElementById("registroModeradorForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    // Obtenemos los valores de los campos del formulario
+    const nombre = document.getElementById("nombre").value;
+    const correo = document.getElementById("correo").value;
+    const contrasena = document.getElementById("contrasena").value;
+    const confirmarContrasena = document.getElementById("confirmarContrasena").value;
+
+    // Validación básica del lado del cliente
+    if (contrasena !== confirmarContrasena) {
+      alert("Las contraseñas no coinciden");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/moderadores/registro", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          nombre: nombre,
+          correo: correo,
+          contrasena: contrasena
+        })
+      });
+
+      const result = await response.text();
+
+      if (response.ok) {
+        alert("Moderador registrado correctamente");
+        window.location.href = "login.html"; // Redirigir al login
+      } else {
+        alert("Error: " + result);
+      }
+    } catch (error) {
+      console.error("Error en la solicitud:", error);
+      alert("Error del servidor");
+    }
+  });
+</script>

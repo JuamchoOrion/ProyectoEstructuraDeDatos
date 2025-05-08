@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @DiscriminatorValue("MODERADOR")
 @NoArgsConstructor // Constructor sin argumentos (requerido por JPA)
 public class Moderador extends Usuario {
+
     @Transient
     private RedSocial red_social;
     public Moderador(String nombre, String contrasenia, String email) {
