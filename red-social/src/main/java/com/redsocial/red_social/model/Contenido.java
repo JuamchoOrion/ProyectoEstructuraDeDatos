@@ -17,7 +17,7 @@ public class Contenido {
 
     @ManyToOne
     @JoinColumn(name = "estudiante_id")
-    private Estudiante estudiante;
+    private Estudiante autor;
 
     @Transient
     private RedSocial red_social;

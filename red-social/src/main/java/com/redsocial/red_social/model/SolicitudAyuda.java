@@ -30,9 +30,6 @@ public class SolicitudAyuda implements Comparable<SolicitudAyuda> {
 
     @Override
     public int compareTo(SolicitudAyuda otra) {
-        // A menor diferencia de tiempo con respecto a la fecha actual, mayor prioridad
-        long ahora = new Date().getTime();
-        long diferenciaEsta = Math.abs(fechaNecesidad.getTime() - ahora);
-        long diferenciaOtra = Math.abs(otra.fechaNecesidad.getTime() - ahora);
-        return Long.compare(diferenciaEsta, diferenciaOtra);
+        return Long.compare(this.fechaNecesidad.getTime(), otra.fechaNecesidad.getTime());
+
     }}
