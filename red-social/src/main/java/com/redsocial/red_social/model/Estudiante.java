@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Estudiante extends Usuario {
+public class Estudiante extends Usuario implements Comparable<Estudiante>{
 
 
     @ManyToMany
@@ -47,6 +47,11 @@ public class Estudiante extends Usuario {
         contenidosPublicados.agregar(contenido);
         this.red_social.agregarPublicacion(contenido);
     }
+    public void publicarSolicitudAyuda(SolicitudAyuda solicitudAyuda) {
+        solicitudesAyuda.agregar(solicitudAyuda);
+        this.red_social.agregarSolicitudAyuda(solicitudAyuda);
+
+    }
 
     public void valorarContenido(Contenido contenido) {
         contenido.agregarLike();
@@ -54,5 +59,10 @@ public class Estudiante extends Usuario {
 
     public <T> Contenido buscarContenido(T data) {
         return null;
+    }
+
+    @Override
+    public int compareTo(Estudiante otro) {
+        return getUsername().compareToIgnoreCase(otro.getUsername());
     }
 }
