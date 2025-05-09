@@ -35,11 +35,11 @@ public class CustomUserDetailService implements UserDetailsService {
         return new User(
                 usuario.getUsername(),
                 usuario.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
+                Collections.singletonList(new SimpleGrantedAuthority( role))
         );
     }
 
     private Collection<? extends GrantedAuthority> getAuthorities(String role) {
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
+        return Collections.singletonList(new SimpleGrantedAuthority( role));
     }
 }

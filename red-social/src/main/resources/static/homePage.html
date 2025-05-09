@@ -20,11 +20,9 @@
             <ul class="navbar-nav">
                 <li class="nav-item"><a class="nav-link" href="index.html">Inicio</a></li>
                 <li class="nav-item"><a class="nav-link" href="explorar.html">Explorar</a></li>
-
                 <li class="nav-item"><a class="nav-link" href="perfil.html">Perfil</a></li>
                 <li class="nav-item"><a class="nav-link" href="grupos.html">Grupos</a></li>
                 <li class="nav-item"><a class="nav-link" href="mensajes.html">Mensajes</a></li>
-
             </ul>
             <button class="btn btn-outline-light ms-3" id="cerrarSesion">Cerrar Sesión</button>
         </div>
@@ -35,22 +33,22 @@
 <div class="container mt-5">
     <h2 class="text-center mb-4">Bienvenido, Estudiante 👋</h2>
 
-    <div class="row">
+    <!-- Fila de paneles centrados -->
+    <div class="row justify-content-center">
         <!-- Panel: Contenidos -->
-        <div class="col-md-4 mb-4">
-            <div class="card border-primary shadow-sm">
+        <div class="col-md-6 mb-4 h-100">
+            <div class="card border-primary shadow-sm d-flex flex-column h-100">
                 <div class="card-header bg-primary text-white">Explora Contenidos</div>
                 <div class="card-body">
                     <p>Busca recursos por tema, autor o tipo. Publica tus propios materiales educativos.</p>
                     <a href="explorar.html" class="btn btn-primary w-100">Ir a Contenidos</a>
-
                 </div>
             </div>
         </div>
 
         <!-- Panel: Grupos -->
-        <div class="col-md-4 mb-4">
-            <div class="card border-success shadow-sm">
+        <div class="col-md-6 mb-4 h-100">
+            <div class="card border-success shadow-sm d-flex flex-column h-100">
                 <div class="card-header bg-success text-white">Grupos de Estudio</div>
                 <div class="card-body">
                     <p>Únete a grupos sugeridos automáticamente según tus intereses.</p>
@@ -58,38 +56,29 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Panel: Solicitudes de Ayuda -->
-        <div class="col-md-4 mb-4">
-            <div class="card border-warning shadow-sm">
+    <!-- Fila de paneles adicionales centrados -->
+    <div class="row justify-content-center">
+        <!-- Panel: Solicitar Ayuda -->
+        <div class="col-md-6 mb-4 h-100">
+            <div class="card border-warning shadow-sm d-flex flex-column h-100">
                 <div class="card-header bg-warning text-dark">Solicitar Ayuda</div>
                 <div class="card-body">
-                    <p>Publica solicitudes de ayuda con nivel de urgencia. Recibe apoyo de otros estudiantes.</p>
+                    <p>Publica solicitudes de ayuda con nivel de urgencia. </p>
                     <a href="#" class="btn btn-warning w-100 text-dark">Solicitar</a>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="row">
         <!-- Panel: Sugerencias -->
-        <div class="col-md-6 mb-4">
-            <div class="card border-info shadow-sm">
+        <div class="col-md-6 mb-4 h-100">
+            <div class="card border-info shadow-sm d-flex flex-column h-100">
                 <div class="card-header bg-info text-white">Sugerencias de Compañeros</div>
                 <div class="card-body">
                     <p>Conéctate con estudiantes con intereses o valoraciones similares.</p>
-                    <a href="#" class="btn btn-info w-100">Ver Sugerencias</a>
-                </div>
-            </div>
-        </div>
 
-        <!-- Panel: Visualizar Grafo -->
-        <div class="col-md-6 mb-4">
-            <div class="card border-dark shadow-sm">
-                <div class="card-header bg-dark text-white">Grafo de Afinidad</div>
-                <div class="card-body">
-                    <p>Explora visualmente tus conexiones académicas con otros estudiantes.</p>
-                    <a href="#" class="btn btn-dark w-100">Ver Grafo</a>
+                    <a href="#" class="btn btn-info w-100">Ver Sugerencias</a>
                 </div>
             </div>
         </div>

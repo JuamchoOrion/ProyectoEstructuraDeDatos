@@ -42,9 +42,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/verify").permitAll()
                         .requestMatchers(
-                                "/", "/index.html", "/login.html", "/registro.html", "/perfil.html",
-                                "/css/**", "/js/**", "/images/**", "/styles.css", "/favicon.ico","/api/registro","/registroModeradores.html", "/api/moderadores/registro"
+                                "/", "/index.html", "/login.html", "/registro.html", "/perfil.html", "loginModerador.html","/registroModeradores.html","moderador.html",
+                                "/css/**", "/js/**", "/images/**", "/styles.css", "/favicon.ico","/api/registro", "/api/moderadores/registro", "/api/moderadores/auth/login"
                         ).permitAll()
+                        .requestMatchers("/api/moderadores/**").hasAuthority("MODERADOR")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)

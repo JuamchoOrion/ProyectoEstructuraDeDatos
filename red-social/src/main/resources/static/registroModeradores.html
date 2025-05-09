@@ -1,63 +1,46 @@
-<!-- FORMULARIO HTML CORREGIDO -->
-<form id="registroModeradorForm">
-  <div class="mb-3">
-    <label for="nombre" class="form-label">Nombre</label>
-    <input type="text" class="form-control" id="nombre" placeholder="Tu nombre completo" required />
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro Moderador - Aprende+</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="bg-light">
+
+<div class="container d-flex justify-content-center align-items-center vh-100">
+  <div class="card shadow p-4" style="max-width: 450px; width: 100%;">
+    <h2 class="text-center mb-4">Registro de Moderador</h2>
+
+    <!-- FORMULARIO HTML CORREGIDO -->
+    <form id="registroModeradorForm">
+      <div class="mb-3">
+        <label for="nombre" class="form-label">Nombre</label>
+        <input type="text" class="form-control" id="nombre" placeholder="Tu nombre completo" required />
+      </div>
+      <div class="mb-3">
+        <label for="correo" class="form-label">Correo electrónico</label>
+        <input type="email" class="form-control" id="correo" placeholder="nombre@ejemplo.com" required />
+      </div>
+      <div class="mb-3">
+        <label for="contrasena" class="form-label">Contraseña</label>
+        <input type="password" class="form-control" id="contrasena" placeholder="Ingresa una contraseña" required />
+      </div>
+      <div class="mb-3">
+        <label for="confirmarContrasena" class="form-label">Confirmar Contraseña</label>
+        <input type="password" class="form-control" id="confirmarContrasena" placeholder="Repite tu contraseña" required />
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Registrarse</button>
+    </form>
+
+    <div class="text-center mt-3">
+      <small>¿Ya tienes cuenta? <a href="loginModerador.html">Inicia sesión</a></small>
+    </div>
   </div>
-  <div class="mb-3">
-    <label for="correo" class="form-label">Correo electrónico</label>
-    <input type="email" class="form-control" id="correo" placeholder="nombre@ejemplo.com" required />
-  </div>
-  <div class="mb-3">
-    <label for="contrasena" class="form-label">Contraseña</label>
-    <input type="password" class="form-control" id="contrasena" placeholder="Ingresa una contraseña" required />
-  </div>
-  <div class="mb-3">
-    <label for="confirmarContrasena" class="form-label">Confirmar Contraseña</label>
-    <input type="password" class="form-control" id="confirmarContrasena" placeholder="Repite tu contraseña" required />
-  </div>
-  <button type="submit" class="btn btn-primary w-100">Registrarse</button>
-</form>
-<script>
-  document.getElementById("registroModeradorForm").addEventListener("submit", async function (e) {
-    e.preventDefault();
+</div>
 
-    // Obtenemos los valores de los campos del formulario
-    const nombre = document.getElementById("nombre").value;
-    const correo = document.getElementById("correo").value;
-    const contrasena = document.getElementById("contrasena").value;
-    const confirmarContrasena = document.getElementById("confirmarContrasena").value;
-
-    // Validación básica del lado del cliente
-    if (contrasena !== confirmarContrasena) {
-      alert("Las contraseñas no coinciden");
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/moderadores/registro", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          nombre: nombre,
-          correo: correo,
-          contrasena: contrasena
-        })
-      });
-
-      const result = await response.text();
-
-      if (response.ok) {
-        alert("Moderador registrado correctamente");
-        window.location.href = "login.html"; // Redirigir al login
-      } else {
-        alert("Error: " + result);
-      }
-    } catch (error) {
-      console.error("Error en la solicitud:", error);
-      alert("Error del servidor");
-    }
-  });
-</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/registroModerador.js"></script>
+</body>
+</html>
