@@ -1,0 +1,30 @@
+<form id="formContenido" enctype="multipart/form-data">
+    <input type="file" name="archivo" required />
+    <input type="text" name="descripcion" placeholder="Descripción" required />
+    <button type="submit">Subir</button>
+</form>
+
+<script>
+    document.getElementById("formContenido").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+
+        const token = localStorage.getItem("token");
+        if (!token) {
+            alert("No hay token disponible. Por favor inicia sesión.");
+            return;
+        }
+
+        const response = await fetch("/api/contenido/subir", {
+            method: "POST",
+            headers: {
+                "Authorization": token, // o "Bearer " + token según tu caso
+            },
+            body: formData
+        });
+
+        const text = await response.text();
+        alert(text);
+    });
+</script>

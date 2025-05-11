@@ -20,6 +20,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -39,11 +40,11 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/login").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/verify").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/login","/api/contenidos/subir").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/verify", "/api/contenidos").permitAll()
                         .requestMatchers(
                                 "/", "/index.html", "/login.html", "/registro.html", "/perfil.html", "loginModerador.html","/registroModeradores.html","moderador.html",
-                                "/css/**", "/js/**", "/images/**", "/styles.css", "/favicon.ico","/api/registro", "/api/moderadores/registro", "/api/moderadores/auth/login"
+                                "/css/**", "/js/**", "/images/**", "/styles.css", "/favicon.ico","/api/registro", "/api/moderadores/registro", "/api/moderadores/auth/login", "publicar.html"
                         ).permitAll()
                         .requestMatchers("/api/moderadores/**").hasAuthority("MODERADOR")
                         .anyRequest().authenticated()

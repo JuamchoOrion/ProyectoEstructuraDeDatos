@@ -49,7 +49,7 @@ public class AuthController {
         }
     }
 
-    // ✅ NUEVO: Endpoint para verificar el token JWT
+
     @GetMapping("/verify")
     public ResponseEntity<?> verifyToken(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");

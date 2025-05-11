@@ -9,6 +9,9 @@ import java.util.Date;
 @Table(name = "solicitudAyuda")
 public class SolicitudAyuda implements Comparable<SolicitudAyuda> {
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Estudiante estudiante;
+
     @Transient
     private RedSocial redSocial;
 
@@ -32,4 +35,9 @@ public class SolicitudAyuda implements Comparable<SolicitudAyuda> {
     public int compareTo(SolicitudAyuda otra) {
         return Long.compare(this.fechaNecesidad.getTime(), otra.fechaNecesidad.getTime());
 
-    }}
+    }
+
+    public void setEstudiante(Estudiante estudiante) {
+        this.estudiante = estudiante;
+    }
+}
