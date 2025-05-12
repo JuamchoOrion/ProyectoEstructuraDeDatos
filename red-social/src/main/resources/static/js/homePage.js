@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Verificación de sesión activa
     if (!user) {
         alert("Por favor, inicia sesión para acceder a esta sección.");
-        window.location.href = "/login.html";
+        window.location.href = "/index.html";
         return;
     }
 
@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
         logoutBtn.addEventListener("click", (e) => {
             e.preventDefault();
             localStorage.removeItem("userEmail");
-            window.location.href = "/login.html";
+            window.location.href = "/index.html";
         });
     }
 });

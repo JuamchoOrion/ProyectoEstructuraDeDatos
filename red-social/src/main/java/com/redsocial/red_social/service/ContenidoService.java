@@ -3,6 +3,7 @@ package com.redsocial.red_social.service;
 import com.redsocial.red_social.dto.ContenidoResponse;
 import com.redsocial.red_social.model.Contenido;
 import com.redsocial.red_social.model.Estudiante;
+import com.redsocial.red_social.model.TipoContenido;
 import com.redsocial.red_social.repository.ContenidoRepository;
 import com.redsocial.red_social.repository.EstudianteRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class ContenidoService {
     @Autowired
     private EstudianteRepository estudianteRepository;
 
-    public Contenido guardarContenido(MultipartFile archivo, String descripcion, String username) throws IOException {
+    public Contenido guardarContenido(MultipartFile archivo, String descripcion, String username, TipoContenido tipoContenido) throws IOException {
         Estudiante autor = estudianteRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
@@ -53,8 +54,25 @@ public class ContenidoService {
                 .descripcion(descripcion)
                 .fechaPublicacion(LocalDateTime.now())
                 .likes(0L)
+                .tipoContenido(tipoContenido)
                 .build();
 
         return contenidoRepository.save(contenido);
+    }
+    // Método para determinar el tipo de contenido basado en el archivo
+    private TipoContenido determinarTipoContenido(MultipartFile archivo) {
+        String contentType = archivo.getContentType();
+        String fileName = archivo.getOriginalFilename().toLowerCase();
+
+        if (contentType.startsWith("video/")) {
+            return TipoContenido.VIDEO_EDUCATIVO;
+        } else if (fileName.endsWith(".pdf") || fileName.endsWith(".doc") || fileName.endsWith(".docx")) {
+            return TipoContenido.MATERIAL_ESTUDIO;
+        } else if (fileName.endsWith(".ppt") || fileName.endsWith(".pptx")) {
+            return TipoContenido.PRESENTACION;
+        } else if (fileName.endsWith(".xls") || fileName.endsWith(".xlsx")) {
+            return TipoContenido.EJERCICIOS_PRACTICOS;
+        }
+        return TipoContenido.OTROS;
     }
 }

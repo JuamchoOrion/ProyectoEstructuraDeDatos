@@ -110,3 +110,69 @@ h1 {
 .black {
     background-color: #343a40;
 }
+.thumbnail-container {
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
+}
+
+.thumbnail-container:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.img-thumbnail {
+    border: none;
+    background-color: transparent;
+}
+
+.card {
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+.animate__animated {
+    animation-duration: 0.3s;
+}
+
+/* Animaciones */
+.animate__animated {
+    animation-duration: 0.3s;
+}
+
+
+.form-control {
+    border-radius: 8px;
+    padding: 10px 15px;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+/* Checkboxes personalizados */
+.form-check-input:checked {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+/* Alertas */
+.alert {
+    border-radius: 8px;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .card {
+        margin: 20px;
+    }
+}

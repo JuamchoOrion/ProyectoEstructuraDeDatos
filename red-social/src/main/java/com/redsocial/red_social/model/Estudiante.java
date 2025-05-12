@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @DiscriminatorValue("ESTUDIANTE")
@@ -34,6 +36,12 @@ public class Estudiante extends Usuario implements Comparable<Estudiante> {
     @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL)
     private List<Contenido> contenidosPublicados = new ArrayList<>();
 
+    @ElementCollection
+    @CollectionTable(name = "estudiante_intereses",
+            joinColumns = @JoinColumn(name = "estudiante_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "interes")
+    private Set<Intereses> intereses = new HashSet<>();
     // Estructuras propias para la lógica de negocio
     @Transient
     private ListaEnlazada<GrupoEstudio> gruposEstudioEnlazada = new ListaEnlazada<>();
@@ -130,6 +138,11 @@ public class Estudiante extends Usuario implements Comparable<Estudiante> {
     public ListaEnlazada<GrupoEstudio> getGruposEstudioEnlazada() {
         sincronizarAEnlazadas();
         return gruposEstudioEnlazada;
+    }
+    public void agregarInteres(Intereses interes){
+        if (!intereses.contains(interes)) {
+            intereses.add(interes);
+        }
     }
 
     @Override

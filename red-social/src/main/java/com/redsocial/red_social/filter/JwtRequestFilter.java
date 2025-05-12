@@ -23,12 +23,24 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.*;
+
+import java.util.Collections;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
+    private static final List<String> EXCLUDED_PATHS_PREFIX = List.of(
+            "/api/login",
+            "/api/registro",
+            "/api/moderadores/registro",
+            "/api/moderadores/auth/login",
+            "/grafo",
+            "/uploads",
+            "/favicon.ico"
+    );
     @Autowired
-    private UsuarioRepository usuarioRepository; // Cambiado a repositorio padre
+    private UsuarioRepository usuarioRepository;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -37,6 +49,15 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain chain) throws ServletException, IOException {
+
+        String path = request.getRequestURI();
+
+        boolean isExcluded = EXCLUDED_PATHS_PREFIX.stream().anyMatch(path::startsWith);
+        if (isExcluded) {
+            chain.doFilter(request, response);
+            return;
+        }
+
 
         final String authorizationHeader = request.getHeader("Authorization");
 
@@ -49,18 +70,15 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            // 1. Obtener usuario desde el repositorio padre
             Usuario usuario = usuarioRepository.findByUsername(username)
                     .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
-            // 2. Determinar el tipo de usuario
             String role = usuario instanceof Moderador ? "MODERADOR" : "ESTUDIANTE";
 
-            // 3. Crear UserDetails con el rol correcto
             UserDetails userDetails = new User(
                     usuario.getUsername(),
                     usuario.getPassword(),
-                    Collections.singletonList(new SimpleGrantedAuthority( role))
+                    Collections.singletonList(new SimpleGrantedAuthority(role))
             );
 
             if (jwtUtil.validateToken(jwt, userDetails)) {
@@ -79,6 +97,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 }
+
 /**
  * //@Component
 public class JwtRequestFilter extends OncePerRequestFilter {

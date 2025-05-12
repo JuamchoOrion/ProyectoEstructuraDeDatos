@@ -40,6 +40,10 @@ public class Contenido {
     @Column(nullable = false)
     private LocalDateTime fechaPublicacion;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TipoContenido tipoContenido;
+
     @Column(nullable = false)
     private Long likes = 0L;
 

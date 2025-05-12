@@ -1,10 +1,23 @@
 package com.redsocial.red_social.dto;
 
+import com.redsocial.red_social.model.Intereses;
+
+import java.util.Set;
+
 public class RegistroDTO {
     private String nombre;
     private String email;
     private String password;
     private String confirmPassword;
+    private Set<Intereses> intereses;
+
+    public Set<Intereses> getIntereses() {
+        return intereses;
+    }
+
+    public void setIntereses(Set<Intereses> intereses) {
+        this.intereses = intereses;
+    }
 
     public RegistroDTO() {}
 

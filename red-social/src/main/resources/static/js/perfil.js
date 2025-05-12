@@ -1,82 +1,103 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // Obtener token de localStorage
     const token = localStorage.getItem("token");
     console.log("Token obtenido del storage:", token);
 
-    // Validación básica del token
     if (!token || !token.startsWith("Bearer ")) {
         console.error("Token no válido o faltante");
-        window.location.href = "login.html";
+        window.location.href = "index.html";
         return;
     }
 
     try {
-        // Verificar token con el backend
+        // Verificación del token
         const verifyResponse = await fetch("/api/verify", {
-            headers: {
-                "Authorization": token // Enviamos el token completo con "Bearer"
-            }
+            headers: { "Authorization": token }
         });
 
-        if (!verifyResponse.ok) {
-            throw new Error("Token inválido o expirado");
+        if (!verifyResponse.ok) throw new Error("Token inválido o expirado");
+
+
+        // ✅ Obtener el perfil del usuario
+        const perfilResponse = await fetch("/api/usuario/perfil", {
+            headers: { "Authorization": token }
+        });
+
+        if (!perfilResponse.ok) {
+            throw new Error("No se pudo obtener el perfil del usuario");
         }
 
-        // Obtener datos del perfil
-        const profileResponse = await fetch("/api/usuario/perfil", {
-            headers: {
-                "Authorization": token
-            }
+        const perfil = await perfilResponse.json();
+
+        // Mostrar nombre de usuario en el DOM
+        document.getElementById("nombreUsuario").textContent = perfil.username;
+
+
+        // Cargar contenidos públicos (explorar)
+        const contenidoResponse = await fetch("/api/contenido/mios", {
+            headers: { "Authorization": token }
         });
 
-        if (!profileResponse.ok) {
-            throw new Error("Error al cargar perfil");
-        }
+        if (!contenidoResponse.ok) throw new Error("Error al obtener contenidos");
 
-        const usuario = await profileResponse.json();
-        document.getElementById('nombreUsuario').textContent = usuario.username;
+        const contenidos = await contenidoResponse.json();
+        localStorage.setItem('contenidos', JSON.stringify(contenidos)); // Guardar en caché
 
-        // Configurar cerrar sesión
-        document.getElementById('cerrarSesion').addEventListener('click', () => {
-            localStorage.removeItem('token');
-            window.location.href = 'login.html';
-        });
-
-        // Cargar y mostrar contenidos
         const contenedor = document.getElementById('contenedorContenidos');
-        let contenidos = JSON.parse(localStorage.getItem('contenidos') || '[]');
-
         const mostrarContenidos = (lista) => {
-            contenedor.innerHTML = lista.length === 0
-                ? '<p class="text-muted">No hay contenidos disponibles.</p>'
-                : lista.map(c => `
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">${c.titulo}</h5>
-                            <p class="card-text">${c.descripcion}</p>
-                            <p class="card-text"><small class="text-muted">Tipo: ${c.tipo} | Autor: ${c.autor}</small></p>
+            contenedor.innerHTML = "";
+
+            if (lista.length === 0) {
+                contenedor.innerHTML = "<p class='text-muted'>No hay contenidos disponibles para explorar.</p>";
+                return;
+            }
+
+            lista.forEach(contenido => {
+                const card = document.createElement("div");
+                card.className = "card mb-3 shadow-sm";
+
+                // Determinar cómo mostrar el contenido según su tipo
+                let mediaContent = '';
+                const fileType = contenido.tipoArchivo.split('/')[0]; // Obtener el tipo principal (image, video, etc.)
+
+                if (fileType === 'image') {
+                    // Mostrar miniatura de imagen
+                    mediaContent = `
+                        <div class="thumbnail-container" style="height: 200px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                            <img src="${contenido.url}" class="img-thumbnail" alt="${contenido.nombreOriginal}" 
+                                 style="max-height: 100%; max-width: 100%; object-fit: contain; cursor: pointer;"
+                                 onclick="window.open('${contenido.url}', '_blank')">
+                        </div>
+                    `;
+                } else {
+                    // Mostrar icono según tipo de archivo para no-imágenes
+                    const iconClass = getFileIconClass(contenido.tipoArchivo, contenido.nombreOriginal);
+                    mediaContent = `
+                        <div class="d-flex flex-column align-items-center p-4">
+                            <i class="${iconClass} fa-4x text-secondary mb-2"></i>
+                            <a href="${contenido.url}" class="btn btn-outline-primary btn-sm" target="_blank">Ver archivo</a>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    ${mediaContent}
+                    <div class="card-body">
+                        <h5 class="card-title">${contenido.nombreOriginal}</h5>
+                        <p class="card-text">${contenido.descripcion}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">${new Date(contenido.fechaPublicacion).toLocaleString()}</small>
+                            <span class="badge bg-success">${contenido.likes} <i class="fas fa-thumbs-up"></i></span>
                         </div>
                     </div>
-                `).join('');
+                `;
+                contenedor.appendChild(card);
+            });
         };
 
         mostrarContenidos(contenidos);
 
-        // Funcionalidad de búsqueda
-        document.getElementById('formBusqueda').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const termino = document.getElementById('barraBusqueda').value.toLowerCase().trim();
-            const filtrados = contenidos.filter(c =>
-                c.titulo.toLowerCase().includes(termino) ||
-                c.autor.toLowerCase().includes(termino) ||
-                c.tipo.toLowerCase().includes(termino)
-            );
-            mostrarContenidos(filtrados);
-        });
-
     } catch (error) {
-        console.error("Error:", error);
-        localStorage.removeItem("token");
-        window.location.href = "login.html";
+        console.error(error);
+        window.location.href = "index.html"; // Redirige en caso de error
     }
 });

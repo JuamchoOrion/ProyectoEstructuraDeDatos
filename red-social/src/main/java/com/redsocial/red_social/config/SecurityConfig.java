@@ -32,7 +32,6 @@ public class SecurityConfig {
         this.jwtRequestFilter = jwtRequestFilter;
         this.userDetailsService = userDetailsService;
     }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -40,19 +39,55 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/login","/api/contenidos/subir").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/verify", "/api/contenidos").permitAll()
+                        // Endpoints públicos estáticos
                         .requestMatchers(
-                                "/", "/index.html", "/login.html", "/registro.html", "/perfil.html", "loginModerador.html","/registroModeradores.html","moderador.html",
-                                "/css/**", "/js/**", "/images/**", "/styles.css", "/favicon.ico","/api/registro", "/api/moderadores/registro", "/api/moderadores/auth/login", "publicar.html"
+                                "/",
+                                "/index.html",
+                                "/login.html",
+                                "/registro.html",
+                                "/perfil.html",
+                                "/loginModerador.html",
+                                "/registroModeradores.html",
+                                "/moderador.html",
+                                "/grafo.html",
+                                "/publicar.html",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/styles.css",
+                                "/favicon.ico",
+                                "/explorar.html",
+                                "explorar.js"
                         ).permitAll()
-                        .requestMatchers("/api/moderadores/**").hasAuthority("MODERADOR")
+
+                        // Endpoints públicos de API
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/login",
+                                "/api/registro",
+                                "/api/moderadores/registro",
+                                "/api/moderadores/auth/login",
+                                "/api/contenido/explorar"
+                        ).permitAll()
+
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/verify",
+                                "/grafo/**",
+                                "/uploads/**",
+                                "/api/contenido/explorar"
+                        ).permitAll()
+
+                        // Endpoints de moderador
+                        .requestMatchers("/api/moderadores/**").hasRole("MODERADOR")
+
+                        // Todos los demás endpoints requieren autenticación
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
-                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No autorizado");
+                            response.setContentType("application/json");
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.getWriter().write("{\"error\":\"No autorizado\",\"message\":\"Autenticación requerida\"}");
                         })
                 );
 
@@ -62,9 +97,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:8080"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
+        configuration.setAllowedOrigins(List.of("http://localhost:8080", "http://127.0.0.1:8080"));
+        configuration.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS","PATCH"));
+        configuration.setAllowedHeaders(List.of("Authorization","Content-Type","X-Requested-With","Accept"));
+        configuration.setExposedHeaders(List.of("Authorization","Content-Disposition"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
@@ -72,7 +108,6 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();

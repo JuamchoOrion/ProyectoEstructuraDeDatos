@@ -1,30 +1,65 @@
 <form id="formContenido" enctype="multipart/form-data">
-    <input type="file" name="archivo" required />
-    <input type="text" name="descripcion" placeholder="Descripción" required />
-    <button type="submit">Subir</button>
+    <div class="mb-3">
+        <input type="file" name="archivo" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <input type="text" name="descripcion" class="form-control" placeholder="Descripción" required />
+    </div>
+
+    <div class="mb-3">
+        <label for="tipoContenido" class="form-label">Tipo de Contenido</label>
+        <select class="form-select" name="tipoContenido" id="tipoContenido" required>
+            <option value="">Seleccione un tipo...</option>
+            <option value="MATERIAL_ESTUDIO">Material de estudio</option>
+            <option value="EJERCICIOS_PRACTICOS">Ejercicios prácticos</option>
+            <option value="VIDEO_EDUCATIVO">Video educativo</option>
+            <option value="ENLACE_EXTERNO">Enlace externo</option>
+            <option value="PRESENTACION">Presentación</option>
+            <option value="OTROS">Otros recursos</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Subir</button>
 </form>
 
 <script>
     document.getElementById("formContenido").addEventListener("submit", async function (e) {
         e.preventDefault();
-        const form = e.target;
-        const formData = new FormData(form);
 
         const token = localStorage.getItem("token");
         if (!token) {
             alert("No hay token disponible. Por favor inicia sesión.");
+            window.location.href = "login.html";
             return;
         }
 
-        const response = await fetch("/api/contenido/subir", {
-            method: "POST",
-            headers: {
-                "Authorization": token, // o "Bearer " + token según tu caso
-            },
-            body: formData
-        });
+        try {
+            const formData = new FormData(this); // Usar 'this' para referenciar el formulario
 
-        const text = await response.text();
-        alert(text);
+            const response = await fetch("/api/contenido/subir", {
+                method: "POST",
+                headers: {
+                    "Authorization": token, // Asegúrate que coincida con lo que espera tu backend
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(error || "Error al subir el contenido");
+            }
+
+            const result = await response.text();
+            alert("Contenido subido con éxito: " + result);
+
+            // Opcional: Limpiar el formulario o redirigir
+            this.reset();
+            // window.location.reload();
+
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error: " + error.message);
+        }
     });
 </script>
