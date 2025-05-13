@@ -176,3 +176,10 @@ h1 {
         margin: 20px;
     }
 }
+.estrella {
+    font-size: 1.5em;
+    transition: color 0.2s;
+}
+.estrella.filled {
+    color: gold;
+}

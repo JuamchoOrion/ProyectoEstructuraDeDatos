@@ -66,7 +66,8 @@ public class SecurityConfig {
                                 "/api/registro",
                                 "/api/moderadores/registro",
                                 "/api/moderadores/auth/login",
-                                "/api/contenido/explorar"
+                                "/api/contenido/explorar",
+                                "/api/contenido/*/valorar"
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.GET,

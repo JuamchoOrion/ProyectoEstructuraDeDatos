@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // Verificación de autenticación mediante JWT
     const token = localStorage.getItem('token');
 
     if (!token) {
@@ -8,28 +7,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // Variables globales
     let contenidos = [];
     const barraBusqueda = document.getElementById('barraBusqueda');
     const formBusqueda = document.getElementById('formBusqueda');
     const contenedor = document.getElementById('contenedorExplorar');
 
-    // Cerrar sesión
     document.getElementById('cerrarSesion')?.addEventListener('click', () => {
         localStorage.removeItem('token');
         window.location.href = 'index.html';
     });
 
-    // Mostrar contenidos al cargar
     fetchContenidos();
 
-    // Buscar contenidos
     formBusqueda?.addEventListener('submit', (e) => {
         e.preventDefault();
         buscarContenidos();
     });
 
-    // Función para buscar contenidos
     function buscarContenidos() {
         const query = barraBusqueda?.value.trim().toLowerCase() || '';
 
@@ -48,7 +42,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderContenidos(resultados);
     }
 
-    // Obtener contenidos desde la API
     async function fetchContenidos() {
         try {
             const response = await fetch('/api/contenido/explorar', {
@@ -60,7 +53,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (!response.ok) {
                 if (response.status === 401) {
-                    // Token inválido o expirado
                     localStorage.removeItem('token');
                     window.location.href = 'index.html';
                     return;
@@ -76,7 +68,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Función para determinar el icono según tipo de archivo
     function getFileIconClass(fileType, fileName) {
         const extension = fileName?.split('.').pop()?.toLowerCase() || '';
         const mainType = fileType?.split('/')[0] || '';
@@ -85,7 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (mainType === 'video') return 'fas fa-video';
         if (mainType === 'audio') return 'fas fa-music';
 
-        switch(extension) {
+        switch (extension) {
             case 'pdf': return 'fas fa-file-pdf';
             case 'doc':
             case 'docx': return 'fas fa-file-word';
@@ -100,10 +91,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Mostrar resultados en pantalla con miniaturas
     function renderContenidos(lista) {
         if (!contenedor) return;
-
         contenedor.innerHTML = '';
 
         if (!lista || lista.length === 0) {
@@ -113,13 +102,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         lista.forEach(c => {
             try {
-                // Determinar cómo mostrar el contenido según su tipo
                 let mediaContent = '';
-                const fileType = c.tipoArchivo?.split('/')[0] || ''; // Obtener el tipo principal
+                const fileType = c.tipoArchivo?.split('/')[0] || '';
                 const iconClass = getFileIconClass(c.tipoArchivo, c.nombreOriginal);
 
                 if (fileType === 'image') {
-                    // Mostrar miniatura de imagen
                     mediaContent = `
                         <div class="thumbnail-container" style="height: 200px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #f8f9fa;">
                             <img src="${c.url}" class="img-thumbnail" alt="${c.nombreOriginal || 'Imagen'}" 
@@ -128,7 +115,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                         </div>
                     `;
                 } else {
-                    // Mostrar icono para otros tipos de archivo
                     mediaContent = `
                         <div class="d-flex flex-column align-items-center p-4" style="height: 200px; background: #f8f9fa;">
                             <i class="${iconClass} fa-4x text-secondary mb-3"></i>
@@ -152,9 +138,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                       <small class="text-muted">Publicado el ${c.fechaPublicacion ? new Date(c.fechaPublicacion).toLocaleDateString() : 'fecha desconocida'}</small>
                       <div class="mt-3">
                         <div class="valoracion" data-id="${c.id}">
-                          ${renderStars(c.id)}
+                          ${renderStars(c.id, c.promedioValoracion || 0)}
                         </div>
-                        <small class="text-muted" id="promedio-${c.id}">Valoración: ${calcularPromedio(c.id)} ⭐</small>
+                        <small class="text-muted" id="promedio-${c.id}">Valoración: ${calcularPromedio(c)} ⭐</small>
                       </div>
                     </div>
                   </div>
@@ -166,32 +152,79 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Renderizar estrellas clicables
-    function renderStars(id) {
+    function renderStars(id, promedio = 0, valoracionUsuario = 0) {
         let estrellas = '';
         for (let i = 1; i <= 5; i++) {
-            estrellas += `<span class="estrella" data-id="${id}" data-valor="${i}" style="cursor:pointer; color: gold;">★</span>`;
+            const isUserRating = valoracionUsuario >= i;
+            const isAverageRating = promedio >= i;
+            const color = isUserRating ? 'gold' : (isAverageRating ? 'lightgoldenrodyellow' : 'gray');
+
+            estrellas += `<span class="estrella" data-id="${id}" data-valor="${i}" 
+                      style="cursor:pointer; font-size: 1.5em; color: ${color}">★</span>`;
         }
         return estrellas;
     }
-
-    // Calcular promedio de valoraciones
-    function calcularPromedio(id) {
-        try {
-            const valoraciones = JSON.parse(localStorage.getItem('valoraciones') || '{}');
-            const lista = valoraciones[id] || [];
-
-            if (lista.length === 0) return 'Sin valorar';
-
-            const promedio = lista.reduce((acc, v) => acc + (v.valor || 0), 0) / lista.length;
-            return isNaN(promedio) ? 'Error' : promedio.toFixed(1);
-        } catch (error) {
-            console.error('Error calculando promedio:', error);
-            return 'Error';
+    function calcularPromedio(contenido) {
+        if (contenido.promedioValoracion === undefined || contenido.promedioValoracion === null) {
+            return 'Sin valorar';
         }
+        return contenido.promedioValoracion.toFixed(1);
     }
 
-    // Manejar clic en estrellas
+    contenedor?.addEventListener('click', async (e) => {
+        if (e.target.classList.contains('estrella')) {
+            try {
+                const starElement = e.target;
+                const id = starElement.getAttribute('data-id');
+                const valor = parseInt(starElement.getAttribute('data-valor'));
+
+                // Resaltar estrellas seleccionadas
+                const starsContainer = starElement.parentElement;
+                const stars = starsContainer.querySelectorAll('.estrella');
+                stars.forEach((s, index) => {
+                    s.style.color = (index < valor) ? 'gold' : 'gray';
+                });
+
+                const response = await fetch(`/api/contenido/${id}/valorar`, {
+                    method: 'POST',
+                    headers: {
+                        "Authorization": token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ puntuacion: valor }) // Cambiado de valoracion a puntuacion
+                });
+
+                if (!response.ok) throw new Error('Error al valorar');
+
+                // Actualizar solo el contenido valorado en lugar de recargar todo
+                const data = await response.json();
+                const promedioElement = document.getElementById(`promedio-${id}`);
+                if (promedioElement) {
+                    promedioElement.textContent = `Valoración: ${data.promedioValoracion?.toFixed(1) || '0.0'} ⭐`;
+                }
+
+                mostrarFeedback('Valoración registrada correctamente', 'success');
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarFeedback(error.message || 'Error al valorar', 'danger');
+            }
+        }
+    });
+
+    function mostrarFeedback(mensaje, tipo = 'info') {
+        const feedbackDiv = document.createElement('div');
+        feedbackDiv.className = `alert alert-${tipo}`;
+        feedbackDiv.textContent = mensaje;
+        document.body.appendChild(feedbackDiv);
+        setTimeout(() => feedbackDiv.remove(), 3000);
+    }
+
+    function mostrarError(mensaje) {
+        contenedor.innerHTML = `<div class="alert alert-danger">${mensaje}</div>`;
+    }
+});
+
+/**
     contenedor?.addEventListener('click', async (e) => {
         if (e.target.classList.contains('estrella')) {
             try {
@@ -203,11 +236,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     return;
                 }
 
-                // Enviar valoración al backend
-                const response = await fetch('/api/contenido/valorar', {
+                const response = await fetch(`/api/contenido/${id}/valorar`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${token}`,
+                        "Authorization": token, // Añade 'Bearer ' antes del token
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
@@ -217,24 +249,33 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
 
                 if (!response.ok) {
-                    throw new Error('Error al enviar valoración');
+                    const errorText = await response.text(); // Lee el error como texto
+                    throw new Error(errorText);
                 }
 
-                // Actualizar UI
+                // Cambia response.json() por response.text() ya que el backend devuelve texto plano
+                const mensaje = await response.text();
+                console.log("Respuesta del servidor:", mensaje);
+
+                // Actualiza la interfaz (opcional)
                 const promedioElement = document.getElementById(`promedio-${id}`);
                 if (promedioElement) {
-                    const data = await response.json();
-                    promedioElement.textContent = `Valoración: ${data.promedio.toFixed(1)} ⭐`;
-                    mostrarFeedback('¡Valoración registrada!', 'success');
+                    // Puedes actualizar el promedio manualmente o hacer otra llamada para obtenerlo
+                    promedioElement.textContent = `Valoración: Calculando...`;
                 }
+
+                mostrarFeedback(mensaje, 'success');
+
+                // Opcional: Recarga los contenidos para actualizar las valoraciones
+                setTimeout(fetchContenidos, 1000);
+
             } catch (error) {
                 console.error('Error en valoración:', error);
-                mostrarFeedback('Error al registrar valoración', 'error');
+                mostrarFeedback(error.message || 'Error al registrar valoración', 'danger');
             }
         }
     });
 
-    // Función para mostrar mensajes de feedback
     function mostrarFeedback(mensaje, tipo = 'success') {
         const feedback = document.createElement('div');
         feedback.className = `alert alert-${tipo} fixed-top mx-auto mt-3`;
@@ -251,7 +292,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 3000);
     }
 
-    // Función para mostrar errores
     function mostrarError(mensaje) {
         const errorContainer = document.getElementById('error-container') || document.createElement('div');
         errorContainer.id = 'error-container';
@@ -268,6 +308,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             errorContainer.style.opacity = '0';
             errorContainer.style.transition = 'opacity 0.5s';
             setTimeout(() => errorContainer.remove(), 500);
-        }, 5000);
+        }, 3000);
     }
-});
+});**/

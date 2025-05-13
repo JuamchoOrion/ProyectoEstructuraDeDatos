@@ -75,4 +75,10 @@ public class ContenidoService {
         }
         return TipoContenido.OTROS;
     }
+
+    public Contenido obtenerPorId(Long id) {
+        return contenidoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Contenido no encontrado con id: " + id));
+    }
+
 }

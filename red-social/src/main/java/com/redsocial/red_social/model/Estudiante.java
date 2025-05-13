@@ -36,6 +36,10 @@ public class Estudiante extends Usuario implements Comparable<Estudiante> {
     @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL)
     private List<Contenido> contenidosPublicados = new ArrayList<>();
 
+    @OneToMany(mappedBy = "estudiante", cascade = CascadeType.ALL)
+    private List<Valoracion> valoraciones = new ArrayList<>();
+
+
     @ElementCollection
     @CollectionTable(name = "estudiante_intereses",
             joinColumns = @JoinColumn(name = "estudiante_id"))

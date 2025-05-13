@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -25,6 +26,8 @@ public class Contenido {
     @JoinColumn(name = "estudiante_id", nullable = false)
     private Estudiante autor;
 
+    @OneToMany(mappedBy = "contenido", cascade = CascadeType.ALL)
+    private List<Valoracion> valoraciones = new ArrayList<>();
     @Column(nullable = false)
     private String nombreOriginal;  // Nombre original del archivo
 
