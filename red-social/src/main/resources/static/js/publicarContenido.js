@@ -1,52 +1,49 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Verificar que el usuario esté autenticado
-    const usuario = localStorage.getItem('usuario');
-    if (!usuario) {
-        alert('Debes iniciar sesión para publicar contenido.');
-        window.location.href = 'index.html';
-        return;
-    }
-
-    // Cerrar sesión
-    const cerrarSesionBtn = document.getElementById('cerrarSesion');
-    cerrarSesionBtn.addEventListener('click', () => {
-        localStorage.removeItem('usuario');
-        window.location.href = 'index.html';
-    });
-
-    // Navegación desde la navbar
-    document.getElementById('navInicio').addEventListener('click', () => window.location.href = 'homePage.html');
-    document.getElementById('navPerfil').addEventListener('click', () => window.location.href = 'perfil.html');
-    document.getElementById('navGrupos').addEventListener('click', () => window.location.href = 'grupos.html');
-    document.getElementById('navMensajes').addEventListener('click', () => window.location.href = 'mensajes.html');
-
-    // Manejador del formulario de publicación
-    const form = document.getElementById('formContenido');
-    form.addEventListener('submit', (e) => {
+document.addEventListener("DOMContentLoaded", () => {
+    // Lógica del formulario (no se modifica)
+    document.getElementById("formContenido").addEventListener("submit", async function (e) {
         e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
 
-        const titulo = document.getElementById('titulo').value.trim();
-        const descripcion = document.getElementById('descripcion').value.trim();
-        const tipo = document.getElementById('tipo').value;
-
-        if (!titulo || !descripcion || !tipo) {
-            alert('Por favor, completa todos los campos.');
+        const token = localStorage.getItem("token");
+        if (!token) {
+            alert("No hay token disponible. Por favor inicia sesión.");
             return;
         }
 
-        const nuevoContenido = {
-            titulo,
-            descripcion,
-            tipo,
-            autor: usuario,
-            fecha: new Date().toISOString()
-        };
+        const response = await fetch("/api/contenido/subir", {
+            method: "POST",
+            headers: {
+                "Authorization": token, // o "Bearer " + token según tu caso
+            },
+            body: formData
+        });
 
-        const contenidos = JSON.parse(localStorage.getItem('contenidos') || '[]');
-        contenidos.push(nuevoContenido);
-        localStorage.setItem('contenidos', JSON.stringify(contenidos));
+        const text = await response.text();
+        alert(text);
+    });
 
-        alert('Contenido publicado exitosamente.');
-        form.reset();
+    // Agrega navegabilidad con la navbar
+    const cerrarSesionBtn = document.getElementById('cerrarSesion');
+    if (cerrarSesionBtn) {
+        cerrarSesionBtn.addEventListener('click', () => {
+            localStorage.removeItem('usuario');
+            localStorage.removeItem('token'); // también eliminamos el token por seguridad
+            window.location.href = 'index.html';
+        });
+    }
+
+    const navLinks = {
+        navInicio: 'homePage.html',
+        navPerfil: 'perfil.html',
+        navGrupos: 'grupos.html',
+        navMensajes: 'mensajes.html'
+    };
+
+    Object.entries(navLinks).forEach(([id, href]) => {
+        const link = document.getElementById(id);
+        if (link) {
+            link.addEventListener('click', () => window.location.href = href);
+        }
     });
 });
