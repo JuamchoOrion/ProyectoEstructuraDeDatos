@@ -114,6 +114,7 @@ public class ContenidoController {
                             .nombreOriginal(contenido.getNombreOriginal())
                             .tipoArchivo(contenido.getTipoArchivo())
                             .descripcion(contenido.getDescripcion())
+                            .tipoContenido(contenido.getTipoContenido())
                             .fechaPublicacion(contenido.getFechaPublicacion())
                             .likes(contenido.getLikes())
                             .autor(contenido.getAutor().getUsername())

@@ -34,7 +34,28 @@
         </div>
     </div>
 </nav>
-
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <form id="formBusqueda" class="d-flex">
+                <input class="form-control me-2" type="search" placeholder="Buscar contenidos..." id="barraBusqueda">
+                <button class="btn btn-outline-primary" type="submit">Buscar</button>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <select id="filtroTipo" class="form-select">
+                <option value="ALL">Todos los tipos</option>
+                <option value="MATERIAL_ESTUDIO">Material de estudio</option>
+                <option value="EJERCICIOS_PRACTICOS">Ejercicios prácticos</option>
+                <option value="VIDEO_EDUCATIVO">Videos educativos</option>
+                <option value="ENLACE_EXTERNO">Enlaces externos</option>
+                <option value="PRESENTACION">Presentaciones</option>
+                <option value="OTROS">Otros</option>
+            </select>
+        </div>
+    </div>
+    <div id="contenedorExplorar" class="row"></div>
+</div>
 <!-- Contenido principal -->
 <div class="container mt-4">
     <h3 class="mb-4 text-center">Explorar Contenidos Publicados</h3>

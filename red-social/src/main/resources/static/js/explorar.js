@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     let contenidos = [];
+    let filtroTipo = 'ALL';
     const barraBusqueda = document.getElementById('barraBusqueda');
     const formBusqueda = document.getElementById('formBusqueda');
     const contenedor = document.getElementById('contenedorExplorar');
@@ -18,6 +19,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     fetchContenidos();
+    document.getElementById('filtroTipo')?.addEventListener('change', (e) => {
+        filtroTipo = e.target.value;
+        aplicarFiltros();
+    });
 
     formBusqueda?.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -27,20 +32,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     function buscarContenidos() {
         const query = barraBusqueda?.value.trim().toLowerCase() || '';
 
-        if (!query) {
-            renderContenidos(contenidos);
-            return;
-        }
-
         const resultados = contenidos.filter(c => {
-            return (c.nombreOriginal?.toLowerCase().includes(query)) ||
+            // Filtro por tipo
+            const tipoCoincide = filtroTipo === 'ALL' || c.tipoContenido === filtroTipo;
+
+            // Filtro por búsqueda
+            const textoCoincide = !query ||
+                (c.nombreOriginal?.toLowerCase().includes(query)) ||
                 (c.descripcion?.toLowerCase().includes(query)) ||
-                (c.tipoArchivo?.toLowerCase().includes(query)) ||
                 (c.autor?.toLowerCase().includes(query));
+
+            return tipoCoincide && textoCoincide;
         });
 
         renderContenidos(resultados);
     }
+
+    function aplicarFiltros() {
+        buscarContenidos();
+    }
+
 
     async function fetchContenidos() {
         try {
@@ -61,7 +72,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             contenidos = await response.json();
-            renderContenidos(contenidos);
+            aplicarFiltros();
+            //renderContenidos(contenidos);
         } catch (error) {
             console.error('Error al cargar los contenidos:', error);
             mostrarError('Error al cargar los contenidos. Por favor, intenta nuevamente.');
