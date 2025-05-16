@@ -148,6 +148,35 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         mostrarContenidos(contenidos);
 
+        const solicitudesResponse = await fetch("/api/solicitudes/urgentes", {
+            headers: { "Authorization": token }
+        });
+
+        if (!solicitudesResponse.ok) throw new Error("Error al obtener solicitudes de ayuda");
+
+        const solicitudes = await solicitudesResponse.json();
+        const contenedorSolicitudes = document.getElementById("contenedorSolicitudesAyuda");
+
+        if (solicitudes.length === 0) {
+            contenedorSolicitudes.innerHTML = "<p class='text-muted'>No tienes solicitudes de ayuda urgentes.</p>";
+        } else {
+            solicitudes.forEach(solicitud => {
+                const card = document.createElement("div");
+                card.className = "border p-3 mb-2 rounded shadow-sm";
+
+                const fecha = new Date(solicitud.fechaNecesidad).toLocaleDateString();
+
+                card.innerHTML = `
+            <h6><i class="bi bi-exclamation-triangle text-danger"></i> ${solicitud.interes}</h6>
+            <p><strong>Fecha de necesidad:</strong> ${fecha}</p>
+            <p><strong>Petición:</strong> ${solicitud.peticion}</p>
+        `;
+
+                contenedorSolicitudes.appendChild(card);
+            });
+        }
+
+
     } catch (error) {
         console.error("Error:", error);
         window.location.href = "index.html";

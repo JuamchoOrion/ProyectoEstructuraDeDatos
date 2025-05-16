@@ -51,12 +51,14 @@ public class SecurityConfig {
                                 "/moderador.html",
                                 "/grafo.html",
                                 "/publicar.html",
+                                "/solicitudAyuda.html",
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
                                 "/styles.css",
                                 "/favicon.ico",
                                 "/explorar.html",
+                                "/solicitudAyuda.js",
                                 "explorar.js"
                         ).permitAll()
 
@@ -67,14 +69,18 @@ public class SecurityConfig {
                                 "/api/moderadores/registro",
                                 "/api/moderadores/auth/login",
                                 "/api/contenido/explorar",
-                                "/api/contenido/*/valorar"
+                                "/api/contenido/*/valorar",
+                                "/api/solicitudes/urgentes",
+                                "/api/solicitudes"
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.GET,
                                 "/api/verify",
                                 "/grafo/**",
                                 "/uploads/**",
-                                "/api/contenido/explorar"
+                                "/api/contenido/explorar",
+                                "/api/solicitudes/urgentes",
+                                "/api/solicitudes"
                         ).permitAll()
 
                         // Endpoints de moderador

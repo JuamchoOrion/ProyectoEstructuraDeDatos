@@ -34,4 +34,9 @@ public class EstudianteService  {
         return estudianteRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
     }
+
+    public Estudiante buscarPorUsername(String username) {
+        return estudianteRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Estudiante no encontrado"));
+    }
 }

@@ -2,6 +2,7 @@ package com.redsocial.red_social.controller;
 
 import com.redsocial.red_social.dto.AuthRequest;
 import com.redsocial.red_social.dto.AuthResponse;
+import com.redsocial.red_social.model.Estudiante;
 import com.redsocial.red_social.service.EstudianteService;
 import com.redsocial.red_social.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,8 +40,14 @@ public class AuthController {
                     )
             );
 
+            // Cargar detalles de usuario
             final UserDetails userDetails = estudianteService.loadUserByUsername(authRequest.getUsername());
-            final String jwt = jwtUtil.generateToken(userDetails);
+
+            // Buscar el estudiante para obtener el ID
+            Estudiante estudiante = estudianteService.buscarPorUsername(authRequest.getUsername());
+
+            // Generar token con el ID incluido
+            final String jwt = jwtUtil.generateToken(userDetails, estudiante.getId());
 
             return ResponseEntity.ok(new AuthResponse(jwt));
 
@@ -48,6 +55,27 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales incorrectas");
         }
     }
+
+/**
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody AuthRequest authRequest) {
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            authRequest.getUsername(),
+                            authRequest.getPassword()
+                    )
+            );
+
+            final UserDetails userDetails = estudianteService.loadUserByUsername(authRequest.getUsername());
+            final String jwt = jwtUtil.generateToken(userDetails, userDetails.get);
+
+            return ResponseEntity.ok(new AuthResponse(jwt));
+
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales incorrectas");
+        }
+    }**/
 
 
     @GetMapping("/verify")
