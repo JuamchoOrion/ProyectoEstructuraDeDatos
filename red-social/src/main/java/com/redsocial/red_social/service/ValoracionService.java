@@ -55,4 +55,13 @@ public class ValoracionService {
     public List<Valoracion> obtenerValoracionesDeContenido(Contenido contenido) {
         return valoracionRepository.findByContenido(contenido);
     }
+
+    public double calcularPromedioValoraciones(Contenido contenido) {
+        List<Valoracion> valoraciones = valoracionRepository.findByContenido(contenido);
+        return valoraciones.stream()
+                .mapToInt(Valoracion::getPuntuacion)
+                .average()
+                .orElse(0.0);
+    }
+
 }

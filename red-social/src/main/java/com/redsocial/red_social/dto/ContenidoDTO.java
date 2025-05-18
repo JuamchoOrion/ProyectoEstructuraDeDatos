@@ -22,5 +22,6 @@ public class ContenidoDTO {
     private Long likes;
     private String autor;
     private Double promedioValoracion;
-    private String url; // para acceder al archivo en /uploads/
+    private String url;
+    private String nombreAlmacenado; // para acceder al archivo en /uploads/
 }

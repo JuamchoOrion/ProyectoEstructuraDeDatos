@@ -77,7 +77,6 @@
 </form>
 
 <div id="response" style="margin-top: 20px;"></div>
-
 <script>
     // Mostrar el token actual
     function updateTokenDisplay() {
@@ -99,45 +98,89 @@
         alert('Token eliminado');
     });
 
-    // Inicializar
-    updateTokenDisplay();
-
-    // Tu código JavaScript original
+    // Manejar el envío del formulario
     document.addEventListener("DOMContentLoaded", () => {
-        document.getElementById("formContenido").addEventListener("submit", async function (e) {
+        updateTokenDisplay();
+
+        const form = document.getElementById("formContenido");
+        const responseDiv = document.getElementById('response');
+        const submitBtn = form.querySelector('button[type="submit"]');
+
+        form.addEventListener("submit", async function(e) {
             e.preventDefault();
-            const form = e.target;
-            const formData = new FormData(form);
-            const responseDiv = document.getElementById('response');
+
+            // Deshabilitar botón durante el envío
+            submitBtn.disabled = true;
+            responseDiv.innerHTML = '<p class="upload-status">Subiendo contenido...</p>';
 
             const token = localStorage.getItem("token");
             if (!token) {
-                responseDiv.innerHTML = '<p style="color: red;">Error: No hay token disponible. Por favor inicia sesión.</p>';
+                responseDiv.innerHTML = '<p class="error">Error: No hay token disponible. Por favor inicia sesión.</p>';
+                submitBtn.disabled = false;
                 return;
             }
 
             try {
+                const formData = new FormData(form);
                 const response = await fetch("/api/contenido/subir", {
                     method: "POST",
                     headers: {
-                        "Authorization": token,
+                        "Authorization": token
                     },
                     body: formData
                 });
 
-                const text = await response.text();
-
                 if (response.ok) {
-                    responseDiv.innerHTML = `<p style="color: green;">Éxito: ${text}</p>`;
+                    const data = await response.json();
+                    responseDiv.innerHTML = `
+                        <p class="success">¡Contenido subido con éxito!</p>
+                        <div class="upload-details">
+                            <p><strong>ID:</strong> ${data.contentId}</p>
+                            <p><strong>Archivo:</strong> ${data.nombreOriginal}</p>
+                            <a href="${data.url}" target="_blank" class="view-link">Ver contenido</a>
+                        </div>
+                    `;
+                    // Limpiar formulario después de éxito
+                    form.reset();
                 } else {
-                    responseDiv.innerHTML = `<p style="color: red;">Error (${response.status}): ${text}</p>`;
+                    const error = await response.text();
+                    responseDiv.innerHTML = `<p class="error">Error (${response.status}): ${error}</p>`;
                 }
             } catch (error) {
-                responseDiv.innerHTML = `<p style="color: red;">Error de conexión: ${error.message}</p>`;
+                responseDiv.innerHTML = `<p class="error">Error de conexión: ${error.message}</p>`;
                 console.error("Error:", error);
+            } finally {
+                submitBtn.disabled = false;
             }
         });
     });
+
+    // Estilos inline para los mensajes
+    const style = document.createElement('style');
+    style.textContent = `
+        .error { color: #dc3545; }
+        .success { color: #28a745; font-weight: bold; }
+        .upload-status { color: #17a2b8; }
+        .upload-details {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .view-link {
+            display: inline-block;
+            margin-top: 5px;
+            color: #fff;
+            background: #007bff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+        .view-link:hover {
+            background: #0056b3;
+        }
+    `;
+    document.head.appendChild(style);
 </script>
 </body>
 </html>
