@@ -13,10 +13,7 @@ import java.util.*;
 @Data
 public class Moderador extends Usuario {
 
-    @Transient
-    private List<Usuario> usuarios = new ArrayList<>();
-    @Transient
-    private List<Contenido> contenidos = new ArrayList<>();
+
 
     @Transient
     private RedSocial red_social;
@@ -25,14 +22,7 @@ public class Moderador extends Usuario {
         super(nombre, contrasenia, email);
     }
 
-    public Usuario buscarUsuarioPorNombre(String nombre) {
-        for (Usuario usuario : usuarios) {
-            if(usuario.getUsername().equals(nombre)) {
-                return usuario;
-            }
-        }
-        return null;
-    }
+
     public Map<String, Set<String>> construirGrafoPorGustos() {
         Map<String, Set<String>> grafo = new HashMap<>();
         List<Estudiante> estudiantes = red_social.getEstudiantes();
