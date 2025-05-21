@@ -4,12 +4,14 @@ import com.redsocial.red_social.model.Estudiante;
 import com.redsocial.red_social.model.Usuario;
 import com.redsocial.red_social.repository.EstudianteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 
@@ -38,5 +40,10 @@ public class EstudianteService  {
     public Estudiante buscarPorUsername(String username) {
         return estudianteRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Estudiante no encontrado"));
+    }
+
+    public Estudiante buscarPorId(Long id) {
+        return estudianteRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudiante no encontrado"));
     }
 }

@@ -40,7 +40,7 @@ public class Estudiante extends Usuario implements Comparable<Estudiante> {
     private List<Valoracion> valoraciones = new ArrayList<>();
 
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER) // Cambiado a EAGER
     @CollectionTable(name = "estudiante_intereses",
             joinColumns = @JoinColumn(name = "estudiante_id"))
     @Enumerated(EnumType.STRING)

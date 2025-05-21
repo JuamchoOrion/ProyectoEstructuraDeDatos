@@ -56,26 +56,6 @@ public class AuthController {
         }
     }
 
-/**
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthRequest authRequest) {
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            authRequest.getUsername(),
-                            authRequest.getPassword()
-                    )
-            );
-
-            final UserDetails userDetails = estudianteService.loadUserByUsername(authRequest.getUsername());
-            final String jwt = jwtUtil.generateToken(userDetails, userDetails.get);
-
-            return ResponseEntity.ok(new AuthResponse(jwt));
-
-        } catch (BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales incorrectas");
-        }
-    }**/
 
 
     @GetMapping("/verify")

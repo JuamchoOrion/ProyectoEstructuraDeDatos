@@ -59,7 +59,8 @@ public class SecurityConfig {
                                 "/favicon.ico",
                                 "/explorar.html",
                                 "/solicitudAyuda.js",
-                                "explorar.js"
+                                "explorar.js",
+                                "grafoPrueba.html"
                         ).permitAll()
 
                         // Endpoints públicos de API
@@ -80,7 +81,10 @@ public class SecurityConfig {
                                 "/uploads/**",
                                 "/api/contenido/explorar",
                                 "/api/solicitudes/urgentes",
-                                "/api/solicitudes"
+                                "/api/solicitudes",
+                                "/api/grafo/visualizar",
+                                "api/grafo/comunidades",
+                                "api/grafo/recomendaciones"
                         ).permitAll()
 
                         // Endpoints de moderador

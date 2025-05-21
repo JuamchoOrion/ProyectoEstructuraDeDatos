@@ -20,4 +20,6 @@ public interface ValoracionRepository extends JpaRepository<Valoracion, Long> {
     @Query("SELECT COALESCE(AVG(v.puntuacion), 0.0) FROM Valoracion v WHERE v.contenido.id = :contenidoId")
     Double calcularPromedioPorContenidoId(@Param("contenidoId") Long contenidoId);
 
+
+    List<Valoracion> findByEstudiante(Estudiante estudiante);
 }
