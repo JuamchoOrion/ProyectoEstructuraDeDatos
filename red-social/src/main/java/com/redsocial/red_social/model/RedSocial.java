@@ -19,14 +19,9 @@ public class RedSocial {
 
 
     private List<Usuario> listaUsuarios;
-
     private PriorityQueue<SolicitudAyuda> solicitudAyudas;
-
-
     private List<Moderador> moderadores;
-
     private List<GrupoEstudio> listaGrupoEstudios;
-
     private List<Contenido> listaContenidos;
 
     public RedSocial(List<Usuario> listaUsuarios, PriorityQueue<SolicitudAyuda> solicitudAyudas, List<Moderador> moderadores, List<GrupoEstudio> listaGrupoEstudios) {
@@ -35,6 +30,7 @@ public class RedSocial {
         this.moderadores = moderadores;
         this.listaGrupoEstudios = listaGrupoEstudios;
     }
+
     public void agregarPublicacion(Contenido contenido){
         listaContenidos.add(contenido);
     }
@@ -43,6 +39,7 @@ public class RedSocial {
     }
     public RedSocial() {
     }
+
     public List<Estudiante> getEstudiantes() {
         List<Estudiante> estudiantes = new ArrayList<>();
         for (Usuario usuario : listaUsuarios) {

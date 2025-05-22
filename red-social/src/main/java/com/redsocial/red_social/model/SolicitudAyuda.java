@@ -17,11 +17,18 @@ public class SolicitudAyuda implements Comparable<SolicitudAyuda> {
 
     @Column(name = "fechaNecesidad")
     private Date fechaNecesidad;
+
     @Column(name = "peticion")
     private String peticion;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idSolicitudAyuda;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "interes", nullable = false)
+    private Intereses interes;
+
 
     public SolicitudAyuda(Date fechaNecesidad, String peticion) {
         this.fechaNecesidad = fechaNecesidad;
@@ -33,8 +40,10 @@ public class SolicitudAyuda implements Comparable<SolicitudAyuda> {
 
     @Override
     public int compareTo(SolicitudAyuda otra) {
-        return Long.compare(this.fechaNecesidad.getTime(), otra.fechaNecesidad.getTime());
-
+        // Comparar por proximidad a la fecha actual
+        long diffThis = Math.abs(this.fechaNecesidad.getTime() - new Date().getTime());
+        long diffOtra = Math.abs(otra.fechaNecesidad.getTime() - new Date().getTime());
+        return Long.compare(diffThis, diffOtra);
     }
 
     public void setEstudiante(Estudiante estudiante) {

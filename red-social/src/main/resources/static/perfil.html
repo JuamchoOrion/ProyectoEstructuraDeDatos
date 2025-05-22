@@ -90,6 +90,14 @@
                 </div>
             </div>
         </div>
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-danger text-white">
+                Solicitudes de Ayuda Urgentes
+            </div>
+            <div class="card-body" id="contenedorSolicitudesAyuda">
+                <!-- Aquí se mostrarán las solicitudes -->
+            </div>
+        </div>
 
     </div> <!-- Fin de .row -->
 </div> <!-- Fin de .container-fluid -->
@@ -106,96 +114,3 @@
 <script src="js/perfil.js"></script>
 </body>
 </html>
-
-<!-- CODIGO ANTERIOR POR SI LE MOVI ALGO QUE NO ERA :)-->
-
-<!--<!DOCTYPE html>-->
-<!--<html lang="es">-->
-<!--<head>-->
-<!--    <meta charset="UTF-8" />-->
-<!--    <title>Perfil | Aprende+</title>-->
-<!--    <meta name="viewport" content="width=device-width, initial-scale=1" />-->
-<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />-->
-<!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">-->
-<!--</head>-->
-<!--<body>-->
-<!--&lt;!&ndash; Navbar &ndash;&gt;-->
-<!--<nav class="navbar navbar-expand-lg navbar-dark bg-primary">-->
-<!--    <div class="container-fluid">-->
-<!--        &lt;!&ndash; Barra de búsqueda alineada a la izquierda &ndash;&gt;-->
-<!--        <a class="navbar-brand ms-3" href="#">Aprende+</a>-->
-<!--        <form class="d-flex me-auto" id="formBusqueda" role="search">-->
-<!--            <input class="form-control me-2" type="search" placeholder="Buscar por tema, autor o tipo" aria-label="Buscar" id="barraBusqueda" />-->
-<!--            <button class="btn btn-light" type="submit" id="botonBuscar">-->
-<!--                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">-->
-<!--                    <path d="M11 6a5 5 0 1 1-10 0 5 5 0 0 1 10 0z"/>-->
-<!--                    <path d="M15.7 14.3l-3.9-3.9a6.5 6.5 0 1 0-1.4 1.4l3.9 3.9a1 1 0 0 0 1.4-1.4z"/>-->
-<!--                </svg>-->
-<!--            </button>-->
-<!--        </form>-->
-
-<!--        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">-->
-<!--            <span class="navbar-toggler-icon"></span>-->
-<!--        </button>-->
-
-<!--        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">-->
-<!--            <ul class="navbar-nav mb-2 mb-lg-0">-->
-<!--                <li class="nav-item"><a class="nav-link" href="index.html">Inicio</a></li>-->
-<!--                <li class="nav-item"><a class="nav-link" href="explorar.html">Explorar</a></li>-->
-<!--                <li class="nav-item"><a class="nav-link" href="perfil.html">Perfil</a></li>-->
-<!--                <li class="nav-item"><a class="nav-link" href="grupos.html">Grupos</a></li>-->
-<!--                <li class="nav-item"><a class="nav-link" href="mensajes.html">Mensajes</a></li>-->
-<!--                &lt;!&ndash; Nuevo botón en la navbar &ndash;&gt;-->
-<!--                <li class="nav-item">-->
-<!--                    <button class="btn btn-success ms-2" onclick="location.href='publicar.html'">-->
-<!--                        <i class="bi bi-plus-circle"></i> Publicar Contenido-->
-<!--                    </button>-->
-<!--                </li>-->
-<!--            </ul>-->
-<!--            <button class="btn btn-outline-light ms-3" id="cerrarSesion">Cerrar Sesión</button>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</nav>-->
-
-<!--&lt;!&ndash; Contenido principal &ndash;&gt;-->
-<!--<div class="container-fluid mt-4">-->
-<!--    <div class="row">-->
-<!--        &lt;!&ndash; Panel izquierdo &ndash;&gt;-->
-<!--        <div class="col-md-3 mb-4">-->
-<!--            <div class="card text-center shadow-sm">-->
-<!--                <div class="card-body">-->
-<!--                    <img src="https://via.placeholder.com/100" class="rounded-circle mb-3" alt="Foto Usuario" />-->
-<!--                    <h5 id="nombreUsuario">Usuario</h5>-->
-<!--                    <hr />-->
-<!--                    &lt;!&ndash; Botón mejorado con icono &ndash;&gt;-->
-<!--                    <button class="btn btn-outline-primary w-100 mb-2" onclick="location.href='solicitud.html'">-->
-<!--                        <i class="bi bi-question-circle"></i> Solicitar Ayuda-->
-<!--                    </button>-->
-<!--                    <button class="btn btn-outline-success w-100 mb-2" onclick="location.href='publicar_contenido.html'">-->
-<!--                        <i class="bi bi-plus-circle"></i> Publicar Contenido-->
-<!--                    </button>-->
-<!--                    <button class="btn btn-outline-warning w-100" onclick="location.href='grupos.html'">-->
-<!--                        <i class="bi bi-people-fill"></i> Grupos Sugeridos-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--        <div class="col-md-9">-->
-<!--            <div class="card shadow-sm mb-4">-->
-<!--                <div class="card-header bg-secondary text-white">-->
-<!--                    Contenidos Publicados-->
-<!--                </div>-->
-<!--                <div class="card-body" id="contenedorContenidos">-->
-<!--                    &lt;!&ndash; Aquí se insertarán los contenidos desde JS &ndash;&gt;-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</div>-->
-
-<!--&lt;!&ndash; Agregamos los iconos de Bootstrap Icons &ndash;&gt;-->
-<!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">-->
-<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>-->
-<!--<script src="js/perfil.js"></script>-->
-<!--</body>-->
-<!--</html>-->

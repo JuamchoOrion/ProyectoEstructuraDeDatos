@@ -51,6 +51,7 @@ public class SecurityConfig {
                                 "/moderador.html",
                                 "/grafo.html",
                                 "/publicar.html",
+                                "/solicitudAyuda.html",
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
@@ -62,7 +63,10 @@ public class SecurityConfig {
                                 "reportes.html",
                                 "reportes.js",
                                 "crearEstudiante.html",
-                                "crearEstudiante.js"
+                                "crearEstudiante.js",
+                                "/solicitudAyuda.js",
+                                "explorar.js",
+                                "grafoPrueba.html"
                         ).permitAll()
 
                         // Endpoints públicos de API
@@ -72,19 +76,25 @@ public class SecurityConfig {
                                 "/api/moderadores/registro",
                                 "/api/moderadores/auth/login",
                                 "/api/contenido/explorar",
-                                "/api/contenido/*/valorar"
+                                "/api/contenido/*/valorar",
+                                "/api/solicitudes/urgentes",
+                                "/api/solicitudes"
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.GET,
                                 "/api/verify",
                                 "/grafo/**",
                                 "/uploads/**",
-                                "/api/contenido/explorar"
+                                "/api/contenido/explorar",
+                                "/api/solicitudes/urgentes",
+                                "/api/solicitudes",
+                                "/api/grafo/visualizar",
+                                "api/grafo/comunidades",
+                                "api/grafo/recomendaciones"
                         ).permitAll()
 
                         // Endpoints de moderador
                         .requestMatchers("/api/moderadores/**").hasRole("MODERADOR")
-
 
                         // Todos los demás endpoints requieren autenticación
                         .anyRequest().authenticated()

@@ -34,7 +34,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const resultados = contenidos.filter(c => {
             // Filtro por tipo
-            const tipoCoincide = filtroTipo === 'ALL' || c.tipoContenido === filtroTipo;
+            const tipoCoincide = filtroTipo === 'ALL' ||
+                (c.tipoContenido && c.tipoContenido.toUpperCase() === filtroTipo.toUpperCase());
 
             // Filtro por búsqueda
             const textoCoincide = !query ||

@@ -31,4 +31,8 @@ public class GrupoEstudio {
 
     @Transient
     private List<Contenido> listaContenidos;
+
+    public List<Estudiante> getListaEstudiantes() {
+        return listaEstudiantes;
+    }
 }

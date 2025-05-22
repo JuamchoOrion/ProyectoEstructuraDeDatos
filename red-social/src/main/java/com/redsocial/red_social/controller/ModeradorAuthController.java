@@ -42,6 +42,40 @@ public class ModeradorAuthController {
     @PostMapping("/login")
     public ResponseEntity<?> loginModerador(@RequestBody AuthRequest authRequest) {
         try {
+            // Autenticación
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            authRequest.getUsername(),
+                            authRequest.getPassword()
+                    )
+            );
+
+            UserDetails userDetails = (UserDetails) auth.getPrincipal();
+
+            // Validar que tenga el rol de moderador
+            if (!userDetails.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("MODERADOR"))) {
+                throw new BadCredentialsException("No es un moderador");
+            }
+
+            // Obtener el moderador desde la base de datos para incluir el ID en el token
+            Moderador moderador = moderadorRepository.findByUsername(authRequest.getUsername())
+                    .orElseThrow(() -> new RuntimeException("Moderador no encontrado"));
+
+            // Generar token con ID de moderador
+            String token = jwtUtil.generateToken(userDetails, moderador.getId());
+
+            return ResponseEntity.ok(new AuthResponse(token));
+
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas o rol incorrecto");
+        }
+    }
+
+    /**
+    @PostMapping("/login")
+    public ResponseEntity<?> loginModerador(@RequestBody AuthRequest authRequest) {
+        try {
             // Autenticación general primero
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -63,5 +97,5 @@ public class ModeradorAuthController {
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-    }
+    }**/
 }
