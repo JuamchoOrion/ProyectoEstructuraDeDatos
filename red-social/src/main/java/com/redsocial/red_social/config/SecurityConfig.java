@@ -57,7 +57,12 @@ public class SecurityConfig {
                                 "/styles.css",
                                 "/favicon.ico",
                                 "/explorar.html",
-                                "explorar.js"
+                                "explorar.js",
+                                "moderador.js",
+                                "reportes.html",
+                                "reportes.js",
+                                "crearEstudiante.html",
+                                "crearEstudiante.js"
                         ).permitAll()
 
                         // Endpoints públicos de API
@@ -79,6 +84,7 @@ public class SecurityConfig {
 
                         // Endpoints de moderador
                         .requestMatchers("/api/moderadores/**").hasRole("MODERADOR")
+
 
                         // Todos los demás endpoints requieren autenticación
                         .anyRequest().authenticated()

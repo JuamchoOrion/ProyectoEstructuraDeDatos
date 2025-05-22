@@ -74,6 +74,15 @@ $(document).ready(function() {
         $('#interesesSection').addClass('d-none');
         usuarioModal.show();
     });
+    // Botón reportes moderador
+    $('#btnReportesModerador').click(function () {
+        // Aquí defines qué quieres hacer
+        // Ejemplo: redirigir a otra página
+        window.location.href = 'reportes.html';
+
+        // O si quieres mostrar un modal, puedes usar:
+        // $('#modalReportesModerador').modal('show');
+    });
 
     // Editar usuario
     $('#tablaUsuarios tbody').on('click', '.btn-editar', function() {

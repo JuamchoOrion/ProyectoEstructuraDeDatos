@@ -30,18 +30,17 @@
 </nav>
 
 <!-- Contenido -->
-<div class="container mt-4">
-    <h2 class="mb-4 text-center">Gestión de Usuarios</h2>
-
-    <!-- Botones de creación -->
-    <div class="d-flex justify-content-end mb-3 gap-2">
-        <button id="btnNuevoEstudiante" class="btn btn-success">
-            <i class="fas fa-user-graduate"></i> Nuevo Estudiante
-        </button>
-        <button id="btnNuevoModerador" class="btn btn-info text-white">
-            <i class="fas fa-user-shield"></i> Nuevo Moderador
-        </button>
-    </div>
+<div class="d-flex justify-content-end mb-3 gap-2">
+    <button id="btnNuevoEstudiante" class="btn btn-success" onclick="location.href='crearEstudiante.html'">
+        <i class="fas fa-user-graduate"></i> Nuevo Estudiante
+    </button>
+    <button id="btnNuevoModerador" class="btn btn-info text-white">
+        <i class="fas fa-user-shield"></i> Nuevo Moderador
+    </button>
+    <button id="btnReportesModerador" class="btn btn-warning" onclick="location.href='reportes.html'">
+        <i class="fas fa-flag"></i> Reportes Moderador
+    </button>
+</div>
 
     <!-- Card con tabla -->
     <div class="card shadow mb-4">
