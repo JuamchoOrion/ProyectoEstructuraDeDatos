@@ -5,13 +5,17 @@ package com.redsocial.red_social.dto;
 import com.redsocial.red_social.model.Contenido;
 import com.redsocial.red_social.model.Intereses;
 import com.redsocial.red_social.model.TipoContenido;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ContenidoDTO {
     private Long id;
     private String nombreOriginal;
@@ -23,5 +27,8 @@ public class ContenidoDTO {
     private String autor;
     private Double promedioValoracion;
     private String url;
-    private String nombreAlmacenado; // para acceder al archivo en /uploads/
+
+    private String nombreAlmacenado;
+
+// para acceder al archivo en /uploads/
 }

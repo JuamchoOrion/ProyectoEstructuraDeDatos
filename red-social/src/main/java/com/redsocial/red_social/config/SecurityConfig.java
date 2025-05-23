@@ -60,7 +60,8 @@ public class SecurityConfig {
                                 "/explorar.html",
                                 "/solicitudAyuda.js",
                                 "explorar.js",
-                                "grafoPrueba.html"
+                                "grafoPrueba.html",
+                                "prueba.html"
                         ).permitAll()
 
                         // Endpoints públicos de API
@@ -72,7 +73,8 @@ public class SecurityConfig {
                                 "/api/contenido/explorar",
                                 "/api/contenido/*/valorar",
                                 "/api/solicitudes/urgentes",
-                                "/api/solicitudes"
+                                "/api/solicitudes",
+                                "api/grupos-estudio/**"
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.GET,
@@ -84,7 +86,8 @@ public class SecurityConfig {
                                 "/api/solicitudes",
                                 "/api/grafo/visualizar",
                                 "api/grafo/comunidades",
-                                "api/grafo/recomendaciones"
+                                "api/grafo/recomendaciones",
+                                "api/grupos-estudio/**"
                         ).permitAll()
 
                         // Endpoints de moderador

@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
 @Entity
 @Table(name = "contenido")
 @Data
@@ -22,23 +21,29 @@ public class Contenido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)  // Cambiado a LAZY para mejor performance
     @JoinColumn(name = "estudiante_id", nullable = false)
     private Estudiante autor;
 
-    @OneToMany(mappedBy = "contenido", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "contenido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Valoracion> valoraciones = new ArrayList<>();
+
+
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String nombreOriginal;  // Nombre original del archivo
+    private Intereses interes;
+
+    @Column(nullable = false)
+    private String nombreOriginal;
 
     @Column(nullable = false, unique = true)
-    private String nombreAlmacenado; // Nombre único para almacenamiento
+    private String nombreAlmacenado;
 
     @Column(nullable = false)
-    private String tipoArchivo; // "image/jpeg", "application/pdf", etc.
+    private String tipoArchivo;
 
     @Column(nullable = false)
-    private Long tamanio; // Tamaño en bytes
+    private Long tamanio;
 
     @Column(nullable = false)
     private LocalDateTime fechaPublicacion;
@@ -50,8 +55,21 @@ public class Contenido {
     @Column(nullable = false)
     private Long likes = 0L;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000) // Aumentar longitud para descripción
     private String descripcion;
+
+    @ManyToMany(mappedBy = "listaContenidos")
+    private List<GrupoEstudio> grupos = new ArrayList<>();
+    // Métodos para manejar relaciones
+    public void agregarValoracion(Valoracion valoracion) {
+        valoraciones.add(valoracion);
+        valoracion.setContenido(this);
+    }
+
+    public void removerValoracion(Valoracion valoracion) {
+        valoraciones.remove(valoracion);
+        valoracion.setContenido(null);
+    }
 
     public void agregarLike() {
         this.likes++;

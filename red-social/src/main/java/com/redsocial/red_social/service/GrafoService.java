@@ -35,7 +35,6 @@ public class GrafoService {
         this.estudianteRepository = estudianteRepository;
         this.valoracionRepository = valoracionRepository;
         this.grupoEstudioRepository = grupoEstudioRepository;
-        this.inicializarGrafo();
     }
     @PostConstruct
     @Transactional
@@ -69,13 +68,10 @@ public class GrafoService {
         interesesComunes.retainAll(e2.getIntereses());
         afinidad += interesesComunes.size() * 2;
 
-        // Grupos en común (necesitarás un método en el repositorio)
-        List<GrupoEstudio> gruposComunes = grupoEstudioRepository.findByListaEstudiantesContaining(e1)
+        List<GrupoEstudio> gruposComunes = grupoEstudioRepository.findByListaEstudiantesContainingFetch(e1)
                 .stream()
                 .filter(g -> g.getListaEstudiantes().contains(e2))
                 .collect(Collectors.toList());
-        afinidad += gruposComunes.size() * 3;
-
         // Valoraciones similares
         List<Valoracion> valoracionesE1 = valoracionRepository.findByEstudiante(e1);
         List<Valoracion> valoracionesE2 = valoracionRepository.findByEstudiante(e2);

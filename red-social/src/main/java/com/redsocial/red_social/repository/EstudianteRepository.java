@@ -1,6 +1,7 @@
 package com.redsocial.red_social.repository;
 
 import com.redsocial.red_social.model.Estudiante;
+import com.redsocial.red_social.model.Intereses;
 import com.redsocial.red_social.model.Usuario;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,4 +25,6 @@ public interface EstudianteRepository extends JpaRepository<Estudiante, Long> {
     @EntityGraph(attributePaths = {"intereses"})
     @Query("SELECT e FROM Estudiante e")
     List<Estudiante> findAllWithIntereses();
+
+    List<Estudiante> findByInteresesContaining(Intereses interes);
 }

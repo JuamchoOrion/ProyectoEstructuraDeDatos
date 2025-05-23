@@ -3,6 +3,7 @@ package com.redsocial.red_social.service;
 import com.redsocial.red_social.dto.ContenidoResponse;
 import com.redsocial.red_social.model.Contenido;
 import com.redsocial.red_social.model.Estudiante;
+import com.redsocial.red_social.model.Intereses;
 import com.redsocial.red_social.model.TipoContenido;
 import com.redsocial.red_social.model.estructuras.ArbolABB;
 import com.redsocial.red_social.repository.ContenidoRepository;
@@ -105,7 +106,7 @@ public void init() {
 }
 
     public Contenido guardarContenido(MultipartFile archivo, String descripcion,
-                                      String username, TipoContenido tipoContenido) throws IOException {
+                                      String username, TipoContenido tipoContenido, Intereses interes) throws IOException {
         // 1. Validaciones básicas
         if (archivo == null || archivo.isEmpty()) {
             throw new IllegalArgumentException("El archivo no puede estar vacío");
@@ -147,6 +148,7 @@ public void init() {
                 .descripcion(descripcion)
                 .fechaPublicacion(LocalDateTime.now())
                 .likes(0L)
+                .interes(interes)
                 .tipoContenido(tipoContenido)
                 .build();
 

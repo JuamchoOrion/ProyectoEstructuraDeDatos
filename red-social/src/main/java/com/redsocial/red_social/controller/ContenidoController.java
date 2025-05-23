@@ -40,11 +40,13 @@ public class ContenidoController {
     private final ValoracionService valoracionService;
     private final EstudianteRepository estudianteRepository;
     private final ContenidoRepository contenidoRepository;
+
     @PostMapping("/subir")
     public ResponseEntity<?> subirContenido(
             @RequestParam("archivo") MultipartFile archivo,
             @RequestParam("descripcion") String descripcion,
             @RequestParam("tipoContenido") TipoContenido tipoContenido,
+            @RequestParam("interes") Intereses interes,
             Principal principal) {
         try {
             String username = principal.getName();
@@ -52,7 +54,8 @@ public class ContenidoController {
                     archivo,
                     descripcion,
                     username,
-                    tipoContenido
+                    tipoContenido,
+                    interes
             );
 
             return ResponseEntity.ok()
