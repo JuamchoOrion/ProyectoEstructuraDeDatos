@@ -1,10 +1,15 @@
 package com.redsocial.red_social.controller;
 
 import com.redsocial.red_social.dto.InteresRequest;
+import com.redsocial.red_social.dto.UsuarioDTO;
 import com.redsocial.red_social.model.Estudiante;
+import com.redsocial.red_social.model.Moderador;
 import com.redsocial.red_social.model.Usuario;
 import com.redsocial.red_social.repository.EstudianteRepository;
+import com.redsocial.red_social.repository.UsuarioRepository;
+import com.redsocial.red_social.service.UsuarioService;
 import com.redsocial.red_social.util.JwtUtil;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -13,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -23,6 +29,10 @@ public class UsuarioController {
 
     @Autowired
     private EstudianteRepository estudianteRepository;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+    @Autowired
+    private UsuarioService usuarioService;
     @Autowired
     private JwtUtil jwtUtil;
 
@@ -54,8 +64,12 @@ public class UsuarioController {
                         .collect(Collectors.toList()));
             }
         }
-
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/listar")
+    public ResponseEntity<List<UsuarioDTO>> listarUsuarios() {
+        return ResponseEntity.ok(usuarioService.obtenerTodos());
     }
 
     @PostMapping("/{id}/intereses")
@@ -101,4 +115,16 @@ public class UsuarioController {
 
         return ResponseEntity.ok("Interés eliminado correctamente");
     }
-}
+    @DeleteMapping("/{id}/eliminar")
+    public ResponseEntity<?> eliminarUsuario(@PathVariable Long id) {
+        try {
+            usuarioService.eliminarUsuario(id);
+            return ResponseEntity.ok().build();
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Usuario no encontrado con ID: " + id);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al eliminar usuario: " + e.getMessage());
+        }
+}}

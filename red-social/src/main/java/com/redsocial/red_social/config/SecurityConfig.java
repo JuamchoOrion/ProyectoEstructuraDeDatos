@@ -81,6 +81,7 @@ public class SecurityConfig {
                                 "/api/solicitudes/urgentes",
                                 "/api/solicitudes",
                                 "api/grupos-estudio/**"
+
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.GET,
@@ -93,11 +94,17 @@ public class SecurityConfig {
                                 "/api/grafo/visualizar",
                                 "api/grafo/comunidades",
                                 "api/grafo/recomendaciones",
-                                "api/grupos-estudio/**"
+                                "api/grupos-estudio/**",
+                                "api/usuario/listar"
+                        ).permitAll()
+
+                        .requestMatchers(HttpMethod.DELETE,
+                                "/api/usuario/*/eliminar"
                         ).permitAll()
 
                         // Endpoints de moderador
                         .requestMatchers("/api/moderadores/**").hasRole("MODERADOR")
+
 
                         // Todos los demás endpoints requieren autenticación
                         .anyRequest().authenticated()
