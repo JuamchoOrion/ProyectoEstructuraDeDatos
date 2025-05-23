@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crear Estudiante - Aprende+</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <!-- Agregar Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body class="bg-light">
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow p-4" style="max-width: 450px; width: 100%;">
+        <h2 class="text-center mb-4">Crear Estudiante</h2>
+        <form id="registroForm">
+            <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre de usuario</label>
+                <input type="text" class="form-control" id="nombre" placeholder="Nombre del estudiante" required />
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Correo electrónico</label>
+                <input type="email" class="form-control" id="email" placeholder="correo@ejemplo.com" required />
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Contraseña</label>
+                <input type="password" class="form-control" id="password" placeholder="Mínimo 6 caracteres" required />
+            </div>
+            <div class="mb-3">
+                <label for="confirmPassword" class="form-label">Confirmar contraseña</label>
+                <input type="password" class="form-control" id="confirmPassword" placeholder="Repite la contraseña" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Selecciona intereses del estudiante</label>
+                <div class="d-flex flex-column gap-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="matematicas" value="MATEMATICAS" />
+                        <label class="form-check-label" for="matematicas">
+                            <i class="fas fa-square-root-alt me-2"></i>Matemáticas
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="fisica" value="FISICA" />
+                        <label class="form-check-label" for="fisica">
+                            <i class="fas fa-atom me-2"></i>Física
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="biologia" value="BIOLOGIA" />
+                        <label class="form-check-label" for="biologia">
+                            <i class="fas fa-dna me-2"></i>Biología
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="sociales" value="SOCIALES" />
+                        <label class="form-check-label" for="sociales">
+                            <i class="fas fa-globe-americas me-2"></i>Sociales
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="etica" value="ETICA" />
+                        <label class="form-check-label" for="etica">
+                            <i class="fas fa-hand-holding-heart me-2"></i>Ética
+                        </label>
+                    </div>
+                </div>
+                <small class="form-text text-muted">Selecciona al menos un interés</small>
+            </div>
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-user-plus me-2"></i>Crear Estudiante
+                </button>
+            </div>
+            <div id="registro-alert-container"></div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/registro.js"></script>
+</body>
+</html>
