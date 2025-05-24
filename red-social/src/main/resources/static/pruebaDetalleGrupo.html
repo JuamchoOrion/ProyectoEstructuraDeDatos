@@ -1,10 +1,73 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>Prueba Detalles del Grupo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+        }
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
 </head>
 <body>
-$END$
+<h1>Consultar Detalles de un Grupo</h1>
+
+<label for="grupoId">ID del Grupo:</label>
+<input type="number" id="grupoId" placeholder="Ej: 1" required>
+<button id="consultarBtn">Consultar</button>
+
+<h2>Respuesta:</h2>
+<pre id="resultado">Esperando consulta...</pre>
+
+<script>
+    document.getElementById("consultarBtn").addEventListener("click", async () => {
+        const grupoId = document.getElementById("grupoId").value.trim();
+        const resultado = document.getElementById("resultado");
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            resultado.textContent = "Error: No hay token JWT en localStorage.";
+            return;
+        }
+
+        if (!grupoId) {
+            resultado.textContent = "Por favor ingresa un ID de grupo.";
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/grupos-estudio/${grupoId}`, {
+                headers: {
+                    "Authorization": token
+                }
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                resultado.textContent = `Error ${response.status}:\n${errorText}`;
+                return;
+            }
+
+            const data = await response.json();
+            resultado.textContent = JSON.stringify(data, null, 2);
+        } catch (error) {
+            resultado.textContent = "Error de red: " + error.message;
+        }
+    });
+</script>
 </body>
 </html>

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface SolicitudAyudaRepository extends JpaRepository<SolicitudAyuda, Long> {
 
@@ -15,4 +16,7 @@ public interface SolicitudAyudaRepository extends JpaRepository<SolicitudAyuda, 
     List<SolicitudAyuda> findAllByProximidad();
     @Query("SELECT s FROM SolicitudAyuda s WHERE s.estudiante.username = :username ORDER BY s.fechaNecesidad ASC")
     List<SolicitudAyuda> findUrgentesByUsername(@Param("username") String username);
+
+    Optional<SolicitudAyuda> findByIdSolicitudAyuda(Long idSolicitudAyuda);
+
 }

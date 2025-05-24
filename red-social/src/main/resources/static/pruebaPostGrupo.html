@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Prueba de Grupos de Estudio</title>
+</head>
+<body>
+<h1>Publicar Contenido en Grupo</h1>
+<form id="contenidoForm">
+    <label>Grupo ID: <input type="number" id="grupoIdContenido" required></label><br>
+    <label>Archivo: <input type="file" id="archivo" required></label><br>
+    <label>Descripción: <input type="text" id="descripcion" required></label><br>
+    <label for="tipoContenido">Tipo de Contenido:</label>
+    <select id="tipoContenido" name="tipoContenido">
+        <option value="MATERIAL_ESTUDIO">Material de Estudio</option>
+        <option value="EJERCICIOS_PRACTICOS">Ejercicios Prácticos</option>
+        <option value="VIDEO_EDUCATIVO">Video Educativo</option>
+        <option value="ENLACE_EXTERNO">Enlace Externo</option>
+        <option value="PRESENTACION">Presentación</option>
+        <option value="OTROS">Otros</option>
+    </select>
+
+    <!-- Selector de Intereses -->
+    <label for="interes">Interés:</label>
+    <select id="interes" name="interes">
+        <option value="MATEMATICAS">Matemáticas</option>
+        <option value="FISICA">Física</option>
+        <option value="BIOLOGIA">Biología</option>
+        <option value="SOCIALES">Ciencias Sociales</option>
+        <option value="ETICA">Ética</option>
+    </select>
+    <button type="submit">Publicar Contenido</button>
+</form>
+
+<h3>Respuesta de contenido:</h3>
+<pre id="contenidoResponse"></pre>
+
+<hr>
+
+<h1>Crear Solicitud de Ayuda</h1>
+<form id="solicitudForm">
+    <label>Grupo ID: <input type="number" id="grupoIdSolicitud" required></label><br>
+    <label>Petición: <input type="text" id="peticion" required></label><br>
+<br>
+    <label>Fecha Necesidad: <input type="datetime-local" id="fechaNecesidad" required></label><br>
+    <button type="submit">Enviar Solicitud</button>
+</form>
+
+<h3>Respuesta de solicitud:</h3>
+<pre id="solicitudResponse"></pre>
+
+<script>
+    const token = localStorage.getItem("token"); // debe incluir "Bearer " ya
+
+    document.getElementById("contenidoForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const grupoId = document.getElementById("grupoIdContenido").value;
+        const archivo = document.getElementById("archivo").files[0];
+        const descripcion = document.getElementById("descripcion").value;
+        const tipoContenido = document.getElementById("tipoContenido").value;
+
+        const formData = new FormData();
+        formData.append("archivo", archivo);
+        formData.append("descripcion", descripcion);
+        formData.append("tipoContenido", tipoContenido);
+
+        const res = await fetch(`/api/grupos-estudio/${grupoId}/contenidos`, {
+            method: "POST",
+            headers: {
+                Authorization: token
+            },
+            body: formData
+        });
+
+        const data = await res.json();
+        document.getElementById("contenidoResponse").textContent = JSON.stringify(data, null, 2);
+    });
+
+    document.getElementById("solicitudForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const grupoId = document.getElementById("grupoIdSolicitud").value;
+        const peticion = document.getElementById("peticion").value;
+        const interes = document.getElementById("interes").value;
+        const fechaNecesidad = document.getElementById("fechaNecesidad").value;
+
+        const body = {
+            peticion,
+            interes,
+            fechaNecesidad
+        };
+
+        const res = await fetch(`/api/grupos-estudio/${grupoId}/solicitudes`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token
+            },
+            body: JSON.stringify(body)
+        });
+
+        const data = await res.json();
+        document.getElementById("solicitudResponse").textContent = JSON.stringify(data, null, 2);
+    });
+</script>
+</body>
+</html>

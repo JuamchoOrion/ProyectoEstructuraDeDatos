@@ -179,6 +179,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (error) {
         console.error("Error:", error);
-        window.location.href = "index.html";
+        //window.location.href = "index.html";
     }
 });

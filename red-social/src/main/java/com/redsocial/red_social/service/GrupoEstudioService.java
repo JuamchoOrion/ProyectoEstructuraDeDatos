@@ -1,8 +1,6 @@
 package com.redsocial.red_social.service;
 
-import com.redsocial.red_social.dto.ContenidoDTO;
-import com.redsocial.red_social.dto.EstudianteDTO;
-import com.redsocial.red_social.dto.GrupoEstudioDTO;
+import com.redsocial.red_social.dto.*;
 import com.redsocial.red_social.model.*;
 import com.redsocial.red_social.repository.ContenidoRepository;
 import com.redsocial.red_social.repository.EstudianteRepository;
@@ -11,8 +9,11 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,8 @@ public class GrupoEstudioService {
     private final GrupoEstudioRepository grupoEstudioRepository;
     private final EstudianteRepository estudianteRepository;
     private final ContenidoRepository contenidoRepository;
+    private final ContenidoService contenidoService;
+    private final SolicitudAyudaService solicitudAyudaService;
 
     @Transactional
     public void generarGruposDeEstudio() {
@@ -131,5 +134,85 @@ public class GrupoEstudioService {
         dto.setEmail(estudiante.getEmail());
         dto.setIntereses(estudiante.getIntereses());
         return dto;
+    }
+
+    public GrupoDetalleDTO obtenerDetallesGrupo(Long grupoId, String username) {
+        GrupoEstudio grupo = grupoEstudioRepository.findById(grupoId)
+                .orElseThrow(() -> new EntityNotFoundException("Grupo no encontrado"));
+
+        Estudiante estudiante = estudianteRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("Estudiante no encontrado"));
+
+        // Verificar que el estudiante pertenece al grupo
+        if (!grupo.getListaEstudiantes().contains(estudiante)) {
+            throw new SecurityException("No perteneces a este grupo");
+        }
+
+        return GrupoDetalleDTO.builder()
+                .id(grupo.getId())
+                .interes(grupo.getInteres())
+                .miembros(grupo.getListaEstudiantes().stream()
+                        .map(this::convertToEstudianteDTO)
+                        .collect(Collectors.toList()))
+                .contenidos(grupo.getListaContenidos().stream()
+                    .map(this::convertToContenidoDTO)
+                    .collect(Collectors.toList()))
+                .solicitudes(grupo.getSolicitudAyudas().stream()
+                        .map(this::convertToSolicitudDTO)
+                        .collect(Collectors.toList()))
+                .build();
+    }
+    public SolicitudAyudaDTO convertToSolicitudDTO(SolicitudAyuda solicitudAyuda) {
+        SolicitudAyudaDTO dto = new SolicitudAyudaDTO();
+        dto.setEstudianteId(solicitudAyuda.getEstudiante().getId());
+        dto.setGruposIds(solicitudAyuda.getGrupos() != null ?
+                solicitudAyuda.getGrupos().stream()
+                        .map(GrupoEstudio::getId)
+                        .collect(Collectors.toList()) :
+                Collections.emptyList());
+        dto.setPeticion(solicitudAyuda.getPeticion());
+        dto.setEstudianteUsername(solicitudAyuda.getEstudiante().getUsername());
+        dto.setFechaNecesidad(solicitudAyuda.getFechaNecesidad());
+        dto.setInteres(solicitudAyuda.getInteres());
+        return dto;
+    }
+
+    public ContenidoDTO agregarContenidoAGrupo(Long grupoId, MultipartFile archivo,
+                                               String descripcion, String username,
+                                               TipoContenido tipoContenido) throws IOException {
+
+        GrupoEstudio grupo = grupoEstudioRepository.findById(grupoId)
+                .orElseThrow(() -> new EntityNotFoundException("Grupo no encontrado"));
+
+        // Usamos el interés del grupo como referencia
+        Intereses interes = grupo.getInteres();
+
+        // Guardamos el contenido físicamente y en la base de datos
+        Contenido contenido = contenidoService.guardarContenido(
+                archivo, descripcion, username, tipoContenido, interes);
+
+        // Asociamos el contenido al grupo
+        grupo.getListaContenidos().add(contenido);
+        grupoEstudioRepository.save(grupo);
+
+        // Convertimos a DTO y devolvemos
+        return convertToContenidoDTO(contenido);
+    }
+
+
+    public SolicitudResponseDTO crearSolicitudEnGrupo(Long grupoId, String username,
+                                                      SolicitudRequestDTO requestDTO) {
+
+        GrupoEstudio grupo = grupoEstudioRepository.findById(grupoId)
+                .orElseThrow(() -> new EntityNotFoundException("Grupo no encontrado"));
+
+        SolicitudResponseDTO solicitud = solicitudAyudaService.crearSolicitud(username, requestDTO);
+
+        // Asociar solicitud al grupo
+        SolicitudAyuda solicitudAyuda = solicitudAyudaService.obtenerEntidadPorId(solicitud.getId());
+        grupo.getSolicitudAyudas().add(solicitudAyuda);
+        grupoEstudioRepository.save(grupo);
+
+        return solicitud;
     }
 }

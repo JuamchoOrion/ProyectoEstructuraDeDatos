@@ -7,13 +7,12 @@ import com.redsocial.red_social.model.Estudiante;
 import com.redsocial.red_social.model.SolicitudAyuda;
 import com.redsocial.red_social.repository.EstudianteRepository;
 import com.redsocial.red_social.repository.SolicitudAyudaRepository;
-import jakarta.transaction.Transactional;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -49,5 +48,10 @@ public class SolicitudAyudaService {
         dto.setInteres(solicitud.getInteres());
         dto.setNombreEstudiante(solicitud.getEstudiante().getUsername());
         return dto;
+    }
+
+    public SolicitudAyuda obtenerEntidadPorId(Long id) {
+        return solicitudAyudaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Solicitud no encontrada con ID: " + id));
     }
 }

@@ -21,7 +21,7 @@ public class Contenido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)  // Cambiado a LAZY para mejor performance
+    @ManyToOne(fetch = FetchType.EAGER)  // Cambiado a LAZY para mejor performance
     @JoinColumn(name = "estudiante_id", nullable = false)
     private Estudiante autor;
 
