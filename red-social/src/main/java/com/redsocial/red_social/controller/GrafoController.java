@@ -6,10 +6,13 @@ import com.redsocial.red_social.model.RedSocial;
 import com.redsocial.red_social.model.Intereses;
 import com.redsocial.red_social.model.Moderador;
 import com.redsocial.red_social.model.estructuras.GrafoEstudiantes;
+import com.redsocial.red_social.repository.EstudianteRepository;
 import com.redsocial.red_social.service.EstudianteService;
 import com.redsocial.red_social.util.JwtUtil;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import com.redsocial.red_social.model.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -24,13 +27,15 @@ public class GrafoController {
     private final GrafoEstudiantes grafoEstudiantes;
     private final EstudianteService estudianteService;
     private final JwtUtil jwtUtil;
+    private final EstudianteRepository estudianteRepository;
 
     public GrafoController(GrafoEstudiantes grafoEstudiantes,
                            EstudianteService estudianteService,
-                           JwtUtil jwtUtil) {
+                           JwtUtil jwtUtil, EstudianteRepository estudianteRepository) {
         this.grafoEstudiantes = grafoEstudiantes;
         this.estudianteService = estudianteService;
         this.jwtUtil = jwtUtil;
+        this.estudianteRepository = estudianteRepository;
     }
 
     // Endpoint para obtener recomendaciones basadas en el grafo

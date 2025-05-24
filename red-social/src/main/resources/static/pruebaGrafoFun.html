@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba API Estudiantes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .section {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        button {
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        input {
+            padding: 8px;
+            margin: 5px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<h1>Prueba API de Estudiantes</h1>
+
+<!-- Sección de Recomendaciones -->
+<div class="section">
+    <h2>Obtener Recomendaciones</h2>
+    <button id="getRecsBtn">Obtener Recomendaciones</button>
+    <div id="recommendationsResult" class="result"></div>
+</div>
+
+<!-- Sección de Camino más Corto -->
+<div class="section">
+    <h2>Encontrar Camino a otro Estudiante</h2>
+    <div>
+        <label for="targetId">ID del Estudiante Destino:</label>
+        <input type="number" id="targetId" placeholder="Ingrese el ID del estudiante destino">
+    </div>
+    <button id="findPathBtn">Encontrar Camino</button>
+    <div id="pathResult" class="result"></div>
+</div>
+
+<script>
+    // Configuración
+    const API_BASE_URL = 'http://localhost:8080'; // Ajusta según tu backend
+
+    // Elementos del DOM
+    const getRecsBtn = document.getElementById('getRecsBtn');
+    const findPathBtn = document.getElementById('findPathBtn');
+    const recommendationsResult = document.getElementById('recommendationsResult');
+    const pathResult = document.getElementById('pathResult');
+
+    // Event Listeners
+    getRecsBtn.addEventListener('click', getRecommendations);
+    findPathBtn.addEventListener('click', findPath);
+
+    // Función para obtener recomendaciones
+    async function getRecommendations() {
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            recommendationsResult.innerHTML = '<span class="error">No hay token en localStorage</span>';
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/grafo/recomendaciones`, {
+                headers: {
+                    Authorization: token
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error ${response.status}: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            displayResults(data, recommendationsResult);
+
+        } catch (error) {
+            recommendationsResult.innerHTML = `<span class="error">Error: ${error.message}</span>`;
+        }
+    }
+
+    // Función para encontrar camino
+    async function findPath() {
+        const token = localStorage.getItem('token');
+        const targetId = document.getElementById('targetId').value;
+
+        if (!token) {
+            pathResult.innerHTML = '<span class="error">No hay token en localStorage</span>';
+            return;
+        }
+
+        if (!targetId) {
+            pathResult.innerHTML = '<span class="error">Ingrese un ID de destino válido</span>';
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/grafo/camino/${targetId}`, {
+                headers: {
+                    Authorization: token
+                }
+            });
+
+            if (!response.ok) {
+                if (response.status === 404) {
+                    throw new Error('No se encontró un camino entre los estudiantes');
+                }
+                throw new Error(`Error ${response.status}: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            displayResults(data, pathResult);
+
+        } catch (error) {
+            pathResult.innerHTML = `<span class="error">Error: ${error.message}</span>`;
+        }
+    }
+
+    // Función para mostrar resultados en formato legible
+    function displayResults(data, element) {
+        if (Array.isArray(data)) {
+            if (data.length === 0) {
+                element.innerHTML = "No se encontraron resultados";
+            } else {
+                // Formatear cada estudiante
+                const formatted = data.map(est =>
+                    `ID: ${est.id}\nNombre: ${est.nombre || 'N/A'}\nUsername: ${est.username}\n---`
+                ).join('\n');
+                element.textContent = formatted;
+            }
+        } else {
+            element.textContent = JSON.stringify(data, null, 2);
+        }
+    }
+</script>
+</body>
+</html>

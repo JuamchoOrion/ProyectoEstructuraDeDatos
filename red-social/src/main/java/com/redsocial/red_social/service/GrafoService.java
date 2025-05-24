@@ -54,7 +54,10 @@ public class GrafoService {
             }
         }
     }
-
+    /**
+     * Calcula la afinidad entre dos estudiantes en base exclusivamente
+     * a intereses académicos en común.
+     */
     @Transactional(readOnly = true)
     protected int calcularAfinidad(Estudiante e1, Estudiante e2) {
         // Asegúrate de que las colecciones están inicializadas
@@ -66,25 +69,7 @@ public class GrafoService {
         // Intereses comunes
         Set<Intereses> interesesComunes = new HashSet<>(e1.getIntereses());
         interesesComunes.retainAll(e2.getIntereses());
-        afinidad += interesesComunes.size() * 2;
-
-        List<GrupoEstudio> gruposComunes = grupoEstudioRepository.findByListaEstudiantesContainingFetch(e1)
-                .stream()
-                .filter(g -> g.getListaEstudiantes().contains(e2))
-                .collect(Collectors.toList());
-        // Valoraciones similares
-        List<Valoracion> valoracionesE1 = valoracionRepository.findByEstudiante(e1);
-        List<Valoracion> valoracionesE2 = valoracionRepository.findByEstudiante(e2);
-
-        for (Valoracion v1 : valoracionesE1) {
-            for (Valoracion v2 : valoracionesE2) {
-                if (v1.getContenido().equals(v2.getContenido())) {
-                    if (Math.abs(v1.getPuntuacion() - v2.getPuntuacion()) <= 1) {
-                        afinidad += 1;
-                    }
-                }
-            }
-        }
+        afinidad += interesesComunes.size(); // 1 punto por cada interés común
 
         return afinidad;
     }

@@ -68,7 +68,8 @@ public class SecurityConfig {
                                 "/grafoPrueba.html",
                                 "/prueba.html",
                                 "/pruebaDetalleGrupo.html",
-                                "/pruebaPostGrupo.html"
+                                "/pruebaPostGrupo.html",
+                                "pruebaGrafoFun.html"
                         ).permitAll()
 
                         // Endpoints públicos de API (POST)
@@ -82,7 +83,8 @@ public class SecurityConfig {
                                 "/api/solicitudes/urgentes",
                                 "/api/solicitudes",
                                 "/api/grupos-estudio/*/solicitudes",
-                                "/api/grupos-estudio/*/contenidos"
+                                "/api/grupos-estudio/*/contenidos",
+                                "/api/grupos-estudio/generar"
                         ).permitAll()
 
                         // Endpoints públicos de API (GET)
@@ -98,7 +100,8 @@ public class SecurityConfig {
                                 "/api/grafo/recomendaciones",
                                 "/api/grupos-estudio/**",
                                 "/api/contenido/mios",
-                                "/api/usuario/listar"
+                                "/api/usuario/listar",
+                                "/api/grupos-estudio/estudiante/**"
                         ).permitAll()
 
                         // Endpoints públicos de API (DELETE)
