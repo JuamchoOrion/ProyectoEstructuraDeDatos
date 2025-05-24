@@ -20,7 +20,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 import java.util.List;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -32,6 +31,7 @@ public class SecurityConfig {
         this.jwtRequestFilter = jwtRequestFilter;
         this.userDetailsService = userDetailsService;
     }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -58,21 +58,20 @@ public class SecurityConfig {
                                 "/styles.css",
                                 "/favicon.ico",
                                 "/explorar.html",
-                                "explorar.js",
-                                "moderador.js",
-                                "reportes.html",
-                                "reportes.js",
-                                "crearEstudiante.html",
-                                "crearEstudiante.js",
+                                "/explorar.js",
+                                "/moderador.js",
+                                "/reportes.html",
+                                "/reportes.js",
+                                "/crearEstudiante.html",
+                                "/crearEstudiante.js",
                                 "/solicitudAyuda.js",
-                                "explorar.js",
-                                "grafoPrueba.html",
-                                "prueba.html",
-                                "pruebaDetalleGrupo.html",
-                                "pruebaPostGrupo.html"
+                                "/grafoPrueba.html",
+                                "/prueba.html",
+                                "/pruebaDetalleGrupo.html",
+                                "/pruebaPostGrupo.html"
                         ).permitAll()
 
-                        // Endpoints públicos de API
+                        // Endpoints públicos de API (POST)
                         .requestMatchers(HttpMethod.POST,
                                 "/api/login",
                                 "/api/registro",
@@ -86,6 +85,7 @@ public class SecurityConfig {
                                 "/api/grupos-estudio/*/contenidos"
                         ).permitAll()
 
+                        // Endpoints públicos de API (GET)
                         .requestMatchers(HttpMethod.GET,
                                 "/api/verify",
                                 "/grafo/**",
@@ -97,12 +97,19 @@ public class SecurityConfig {
                                 "/api/grafo/comunidades",
                                 "/api/grafo/recomendaciones",
                                 "/api/grupos-estudio/**",
-                                "/api/contenido/mios"
+                                "/api/contenido/mios",
+                                "/api/usuario/listar"
                         ).permitAll()
-                        // Endpoints de moderador
+
+                        // Endpoints públicos de API (DELETE)
+                        .requestMatchers(HttpMethod.DELETE,
+                                "/api/usuario/*/eliminar"
+                        ).permitAll()
+
+                        // Endpoints para moderadores
                         .requestMatchers("/api/moderadores/**").hasRole("MODERADOR")
 
-                        // Todos los demás endpoints requieren autenticación
+                        // Todos los demás requieren autenticación
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
@@ -131,6 +138,7 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
