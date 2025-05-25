@@ -49,6 +49,7 @@ public class SecurityConfig {
                                 "/loginModerador.html",
                                 "/registroModeradores.html",
                                 "/moderador.html",
+
                                 "/grafo.html",
                                 "/publicar.html",
                                 "/solicitudAyuda.html",
@@ -67,6 +68,7 @@ public class SecurityConfig {
                                 "/solicitudAyuda.js",
                                 "/grafoPrueba.html",
                                 "/prueba.html",
+                                "chat.html",
                                 "/pruebaDetalleGrupo.html",
                                 "/pruebaPostGrupo.html",
                                 "pruebaGrafoFun.html",
@@ -88,7 +90,8 @@ public class SecurityConfig {
                                 "/api/grupos-estudio/generar",
                                 "/api/usuario/agregar"
                         ).permitAll()
-
+                        .requestMatchers("/chat-websocket/**").permitAll()  // handshake SockJS
+                        .requestMatchers("/tema/**").permitAll()            // destino de mensajes STOMP
                         // Endpoints públicos de API (GET)
                         .requestMatchers(HttpMethod.GET,
                                 "/api/verify",
@@ -96,6 +99,8 @@ public class SecurityConfig {
                                 "/uploads/**",
                                 "/api/contenido/explorar",
                                 "/api/solicitudes/urgentes",
+                                "/chat/*",
+                                "/api/usuario/amigos",
                                 "/api/solicitudes",
                                 "/api/grafo/visualizar",
                                 "/api/grafo/comunidades",
