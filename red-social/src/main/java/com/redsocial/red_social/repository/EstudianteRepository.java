@@ -6,6 +6,7 @@ import com.redsocial.red_social.model.Usuario;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -27,4 +28,13 @@ public interface EstudianteRepository extends JpaRepository<Estudiante, Long> {
     List<Estudiante> findAllWithIntereses();
 
     List<Estudiante> findByInteresesContaining(Intereses interes);
+
+
+    @EntityGraph(attributePaths = {"intereses", "amigos"})
+    @Query("SELECT e FROM Estudiante e")
+    List<Estudiante> findAllConRelacionesCompletas();
+
+    @Query("SELECT e FROM Estudiante e LEFT JOIN FETCH e.gruposEstudio WHERE e IN :estudiantes")
+    List<Estudiante> findGruposEstudioByEstudiantes(@Param("estudiantes") List<Estudiante> estudiantes);
+
 }

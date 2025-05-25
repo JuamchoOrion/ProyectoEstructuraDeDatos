@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Prueba Funciones de Amigos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        input, button {
+            padding: 8px;
+            margin: 5px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+        }
+        .error {
+            color: #d9534f;
+        }
+        .success {
+            color: #5cb85c;
+        }
+    </style>
+</head>
+<body>
+<h1>Prueba Funciones de Amigos</h1>
+
+<div class="section">
+    <h2>Agregar Amigo</h2>
+    <input type="text" id="amigoUsername" placeholder="Username del amigo">
+    <button onclick="agregarAmigo()">Agregar Amigo</button>
+    <pre id="agregarResult"></pre>
+</div>
+
+<div class="section">
+    <h2>Eliminar Amigo</h2>
+    <input type="text" id="amigoId" placeholder="ID del amigo">
+    <button onclick="eliminarAmigo()">Eliminar Amigo</button>
+    <pre id="eliminarResult"></pre>
+</div>
+
+<script>
+    // Función para agregar amigo
+    async function agregarAmigo() {
+        const username = document.getElementById('amigoUsername').value;
+        const resultElement = document.getElementById('agregarResult');
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            resultElement.textContent = 'Error: No hay token en localStorage';
+            resultElement.className = 'error';
+            return;
+        }
+
+        if (!username) {
+            resultElement.textContent = 'Por favor ingresa un username';
+            resultElement.className = 'error';
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/usuario/agregar?userAmigo=${encodeURIComponent(username)}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': token
+                }
+            });
+
+            if (response.ok) {
+                resultElement.textContent = 'Amigo agregado exitosamente';
+                resultElement.className = 'success';
+            } else {
+                const error = await response.text();
+                resultElement.textContent = `Error: ${error}`;
+                resultElement.className = 'error';
+            }
+        } catch (error) {
+            resultElement.textContent = `Error de conexión: ${error.message}`;
+            resultElement.className = 'error';
+        }
+    }
+
+    // Función para eliminar amigo
+    async function eliminarAmigo() {
+        const amigoId = document.getElementById('amigoId').value;
+        const resultElement = document.getElementById('eliminarResult');
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            resultElement.textContent = 'Error: No hay token en localStorage';
+            resultElement.className = 'error';
+            return;
+        }
+
+        if (!amigoId) {
+            resultElement.textContent = 'Por favor ingresa un ID de amigo';
+            resultElement.className = 'error';
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/usuario/eliminar?idAmigo=${amigoId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': token
+                }
+            });
+
+            if (response.ok) {
+                resultElement.textContent = 'Amigo eliminado exitosamente';
+                resultElement.className = 'success';
+            } else {
+                const error = await response.text();
+                resultElement.textContent = `Error: ${error}`;
+                resultElement.className = 'error';
+            }
+        } catch (error) {
+            resultElement.textContent = `Error de conexión: ${error.message}`;
+            resultElement.className = 'error';
+        }
+    }
+</script>
+</body>
+</html>

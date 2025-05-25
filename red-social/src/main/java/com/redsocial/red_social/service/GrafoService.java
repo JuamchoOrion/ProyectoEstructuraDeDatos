@@ -36,23 +36,68 @@ public class GrafoService {
         this.valoracionRepository = valoracionRepository;
         this.grupoEstudioRepository = grupoEstudioRepository;
     }
-    @PostConstruct
-    @Transactional
+
     public void inicializarGrafo() {
-        List<Estudiante> estudiantes = estudianteRepository.findAllWithIntereses();
+        this.inicializarGrafoTransactional(); // sigue delegando
+    }
+
+
+    @Transactional
+    public void inicializarGrafoTransactional() {
+        List<Estudiante> estudiantes = estudianteRepository.findAllConRelacionesCompletas();
         estudiantes.forEach(grafoEstudiantes::agregarEstudiante);
 
         for (int i = 0; i < estudiantes.size(); i++) {
+            Estudiante e1 = estudiantes.get(i);
             for (int j = i + 1; j < estudiantes.size(); j++) {
-                Estudiante e1 = estudiantes.get(i);
                 Estudiante e2 = estudiantes.get(j);
-
                 int afinidad = calcularAfinidad(e1, e2);
                 if (afinidad > 0) {
                     grafoEstudiantes.conectarEstudiantes(e1.getId(), e2.getId(), afinidad);
+                    establecerAmistadSiNoExiste(e1, e2);
                 }
             }
         }
+    }
+
+
+    private boolean tienenInteresesComunes(Estudiante e1, Estudiante e2) {
+        Set<Intereses> interesesComunes = new HashSet<>(e1.getIntereses());
+        interesesComunes.retainAll(e2.getIntereses());
+        return !interesesComunes.isEmpty();
+    }
+    private void establecerAmistadSiNoExiste(Estudiante e1, Estudiante e2) {
+        // Verifica si ya son amigos sin disparar la sincronización
+        boolean yaSonAmigos = e1.getAmigos().stream()
+                .anyMatch(amigo -> amigo.getId().equals(e2.getId()));
+
+        if (!yaSonAmigos) {
+            // Establece la amistad sin usar los métodos de sincronización
+            e1.getAmigos().add(e2);
+            e2.getAmigos().add(e1);
+
+            // Guarda los cambios
+            estudianteRepository.saveAll(List.of(e1, e2));
+
+            // Sincroniza después de guardar
+            sincronizarAmistades(e1);
+            sincronizarAmistades(e2);
+        }
+    }
+    private void sincronizarAmistades(Estudiante estudiante) {
+        try {
+            estudiante.sincronizarAPersistencia();
+            estudiante.sincronizarAEnlazadas();
+        } catch (Exception e) {
+
+        }
+    }
+    private void inicializarColeccionesEstudiante(Estudiante estudiante) {
+        Hibernate.initialize(estudiante.getSolicitudesAyuda());
+        Hibernate.initialize(estudiante.getContenidosPublicados());
+        Hibernate.initialize(estudiante.getGruposEstudio());
+        Hibernate.initialize(estudiante.getValoraciones());
+        // Inicializa cualquier otra colección que usen los métodos de sincronización
     }
     /**
      * Calcula la afinidad entre dos estudiantes en base exclusivamente
@@ -60,16 +105,19 @@ public class GrafoService {
      */
     @Transactional(readOnly = true)
     protected int calcularAfinidad(Estudiante e1, Estudiante e2) {
-        // Asegúrate de que las colecciones están inicializadas
+        // Inicializa solo lo necesario
         Hibernate.initialize(e1.getIntereses());
         Hibernate.initialize(e2.getIntereses());
 
         int afinidad = 0;
-
-        // Intereses comunes
         Set<Intereses> interesesComunes = new HashSet<>(e1.getIntereses());
         interesesComunes.retainAll(e2.getIntereses());
-        afinidad += interesesComunes.size(); // 1 punto por cada interés común
+
+        if (!interesesComunes.isEmpty()) {
+            // Usa el nuevo método seguro
+            establecerAmistadSiNoExiste(e1, e2);
+            afinidad += interesesComunes.size();
+        }
 
         return afinidad;
     }
@@ -88,6 +136,19 @@ public class GrafoService {
             if (afinidad > 0) {
                 grafoEstudiantes.conectarEstudiantes(estudiante.getId(), otro.getId(), afinidad);
             }
+        }
+    }
+    private void agregarAmistadSiNoExiste(Estudiante e1, Estudiante e2) {
+        // Inicializa manualmente las colecciones necesarias
+        Hibernate.initialize(e1.getSolicitudesAyuda());
+        Hibernate.initialize(e2.getSolicitudesAyuda());
+        Hibernate.initialize(e1.getContenidosPublicados());
+        Hibernate.initialize(e2.getContenidosPublicados());
+
+        if (!e1.getAmigos().contains(e2)) {
+            e1.agregarAmigo(e2);
+            e2.agregarAmigo(e1);
+            estudianteRepository.saveAll(List.of(e1, e2));
         }
     }
 }

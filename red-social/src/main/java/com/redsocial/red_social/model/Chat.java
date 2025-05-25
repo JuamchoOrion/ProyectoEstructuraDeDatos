@@ -6,12 +6,9 @@ import lombok.Data;
 import java.util.List;
 import java.util.Queue;
 
-@Data
+//@Data
 
 public class Chat {
     private List<Estudiante> estudiantes;
-    private Queue<String> mensajes;
-
-    public Chat() {
-    }
+    private List<Mensaje> mensajes;
 }

@@ -30,7 +30,7 @@ public class Estudiante extends Usuario implements Comparable<Estudiante> {
     @ManyToMany(mappedBy = "listaEstudiantes")
     private List<GrupoEstudio> gruposEstudio = new ArrayList<>();
 
-    @OneToMany(mappedBy = "estudiante", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "estudiante", cascade = CascadeType.ALL)
     private List<SolicitudAyuda> solicitudesAyuda = new ArrayList<>();
 
     @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL)
@@ -46,6 +46,19 @@ public class Estudiante extends Usuario implements Comparable<Estudiante> {
     @Enumerated(EnumType.STRING)
     @Column(name = "interes")
     private Set<Intereses> intereses = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "amistades",
+            joinColumns = @JoinColumn(name = "estudiante_id"),
+            inverseJoinColumns = @JoinColumn(name = "amigo_id")
+    )
+    private Set<Estudiante> amigos = new HashSet<>();
+
+    // Estructura para lógica de negocio (transient)
+    @Transient
+    private ListaEnlazada<Estudiante> amigosEnlazada = new ListaEnlazada<>();
+
     // Estructuras propias para la lógica de negocio
     @Transient
     private ListaEnlazada<GrupoEstudio> gruposEstudioEnlazada = new ListaEnlazada<>();
@@ -63,13 +76,14 @@ public class Estudiante extends Usuario implements Comparable<Estudiante> {
         super(username, password, email);
     }
 
-    // Métodos de sincronización
-    private void sincronizarAPersistencia() {
-        // Actualiza las listas estándar desde las enlazadas
-        this.gruposEstudio = new ArrayList<>();
-        this.solicitudesAyuda = new ArrayList<>();
-        this.contenidosPublicados = new ArrayList<>();
+    public void sincronizarAPersistencia() {
+        // En lugar de crear nuevas instancias, limpia las existentes
+        this.gruposEstudio.clear();
+        this.solicitudesAyuda.clear();
+        this.contenidosPublicados.clear();
+        this.amigos.clear();
 
+        // Agrega los elementos desde las listas enlazadas
         for (GrupoEstudio grupo : gruposEstudioEnlazada) {
             this.gruposEstudio.add(grupo);
         }
@@ -81,17 +95,22 @@ public class Estudiante extends Usuario implements Comparable<Estudiante> {
         for (Contenido contenido : contenidosPublicadosEnlazada) {
             this.contenidosPublicados.add(contenido);
         }
+
+        for (Estudiante estudiante : amigosEnlazada) {
+            this.amigos.add(estudiante);
+        }
     }
 
-    private void sincronizarAEnlazadas() {
+    public void sincronizarAEnlazadas() {
         // Actualiza las listas enlazadas desde las estándar
         this.gruposEstudioEnlazada = new ListaEnlazada<>();
         this.solicitudesAyudaEnlazada = new ListaEnlazada<>();
         this.contenidosPublicadosEnlazada = new ListaEnlazada<>();
-
+        this.amigosEnlazada = new ListaEnlazada<>();
         this.gruposEstudio.forEach(gruposEstudioEnlazada::agregar);
         this.solicitudesAyuda.forEach(solicitudesAyudaEnlazada::agregar);
         this.contenidosPublicados.forEach(contenidosPublicadosEnlazada::agregar);
+        this.amigos.forEach(amigosEnlazada::agregar);
     }
 
     // Métodos de negocio (usando listas enlazadas)
@@ -148,7 +167,34 @@ public class Estudiante extends Usuario implements Comparable<Estudiante> {
             intereses.add(interes);
         }
     }
+    // Métodos para manejar amistades
+    public void agregarAmigo(Estudiante amigo) {
+        // Verificación simple para evitar recursión
+        if (!this.amigos.contains(amigo) && !amigo.getAmigos().contains(this)) {
+            this.amigos.add(amigo);
+            amigo.getAmigos().add(this);
+        }
+    }
 
+    public void eliminarAmigo(Estudiante amigo) {
+        // Elimina directamente de la colección JPA (evitando recursión)
+        this.amigos.remove(amigo);
+        amigo.getAmigos().remove(this);
+
+        // Opcional: Sincroniza solo si es necesario
+        if(this.amigosEnlazada.contiene(amigo)) {
+            this.amigosEnlazada.eliminar(amigo);
+        }
+    }
+    public boolean esAmigoDe(Estudiante otroEstudiante) {
+        sincronizarAEnlazadas();
+        return amigosEnlazada.contiene(otroEstudiante);
+    }
+
+    public ListaEnlazada<Estudiante> getAmigosEnlazada() {
+        sincronizarAEnlazadas();
+        return amigosEnlazada;
+    }
     @Override
     public int compareTo(Estudiante otro) {
         return getUsername().compareToIgnoreCase(otro.getUsername());

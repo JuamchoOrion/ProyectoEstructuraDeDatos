@@ -11,9 +11,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class EstudianteService  {
@@ -45,5 +47,64 @@ public class EstudianteService  {
     public Estudiante buscarPorId(Long id) {
         return estudianteRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudiante no encontrado"));
+    }
+
+    @Transactional
+    public void agregarAmigo(Long idEstudiante1, Long idEstudiante2) {
+        Estudiante estudiante1 = estudianteRepository.findById(idEstudiante1)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudiante 1 no encontrado"));
+
+        Estudiante estudiante2 = estudianteRepository.findById(idEstudiante2)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudiante 2 no encontrado"));
+
+        // Validar que no sean el mismo estudiante
+        if (estudiante1.getId().equals(estudiante2.getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Un estudiante no puede ser amigo de sí mismo");
+        }
+
+        // Agregar amistad bidireccional
+        estudiante1.agregarAmigo(estudiante2);
+        estudiante2.agregarAmigo(estudiante1);
+
+        // Guardar cambios
+        estudianteRepository.save(estudiante1);
+        estudianteRepository.save(estudiante2);
+    }
+
+    // Método para eliminar amistad
+    @Transactional
+    public void eliminarAmigo(Long idEstudiante1, Long idEstudiante2) {
+        Estudiante estudiante1 = estudianteRepository.findById(idEstudiante1)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudiante 1 no encontrado"));
+
+        Estudiante estudiante2 = estudianteRepository.findById(idEstudiante2)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudiante 2 no encontrado"));
+
+        // Eliminar amistad bidireccional
+        estudiante1.eliminarAmigo(estudiante2);
+        estudiante2.eliminarAmigo(estudiante1);
+
+        // Guardar cambios
+        estudianteRepository.save(estudiante1);
+        estudianteRepository.save(estudiante2);
+    }
+
+    // Método para obtener amigos de un estudiante
+    public List<Estudiante> obtenerAmigos(Long idEstudiante) {
+        Estudiante estudiante = estudianteRepository.findById(idEstudiante)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudiante no encontrado"));
+
+        return new ArrayList<>(estudiante.getAmigos());
+    }
+
+    // Método para verificar si dos estudiantes son amigos
+    public boolean sonAmigos(Long idEstudiante1, Long idEstudiante2) {
+        Estudiante estudiante1 = estudianteRepository.findById(idEstudiante1)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudiante 1 no encontrado"));
+
+        Estudiante estudiante2 = estudianteRepository.findById(idEstudiante2)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudiante 2 no encontrado"));
+
+        return estudiante1.getAmigos().contains(estudiante2);
     }
 }

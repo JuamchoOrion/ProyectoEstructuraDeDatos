@@ -1,7 +1,9 @@
 package com.redsocial.red_social.service;
 
 import com.redsocial.red_social.dto.UsuarioDTO;
+import com.redsocial.red_social.model.Estudiante;
 import com.redsocial.red_social.model.Usuario;
+import com.redsocial.red_social.repository.EstudianteRepository;
 import com.redsocial.red_social.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +17,8 @@ public class UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
-
+    @Autowired
+    private EstudianteRepository estudianteRepository;
     public List<UsuarioDTO> obtenerTodos() {
         List<Usuario> usuarios = usuarioRepository.findAll();
 
@@ -41,4 +44,6 @@ public class UsuarioService {
     public void eliminarUsuario(Long id) {
         usuarioRepository.deleteById(id);
     }
+
+
 }

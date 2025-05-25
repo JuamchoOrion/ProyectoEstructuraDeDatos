@@ -7,6 +7,7 @@ import com.redsocial.red_social.model.Moderador;
 import com.redsocial.red_social.model.Usuario;
 import com.redsocial.red_social.repository.EstudianteRepository;
 import com.redsocial.red_social.repository.UsuarioRepository;
+import com.redsocial.red_social.service.EstudianteService;
 import com.redsocial.red_social.service.UsuarioService;
 import com.redsocial.red_social.util.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
@@ -33,6 +34,8 @@ public class UsuarioController {
     private UsuarioRepository usuarioRepository;
     @Autowired
     private UsuarioService usuarioService;
+    @Autowired
+    private EstudianteService estudianteService;
     @Autowired
     private JwtUtil jwtUtil;
 
@@ -127,4 +130,49 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al eliminar usuario: " + e.getMessage());
         }
-}}
+    }
+
+    // Endpoint para agregar amigo
+    @PostMapping("/agregar")
+    public ResponseEntity<?> agregarAmigo(
+            @RequestHeader("Authorization") String token,
+            @RequestParam String userAmigo) {
+
+        try {
+            // Obtener usuario actual del token
+            String username = jwtUtil.extractUsername(token.replace("Bearer ", ""));
+            Estudiante estudianteActual = estudianteService.buscarPorUsername(username);
+            Estudiante amigo = estudianteService.buscarPorUsername(userAmigo);
+            // Llamar al servicio para agregar amigo
+            estudianteService.agregarAmigo(estudianteActual.getId(), amigo.getId());
+            return ResponseEntity.ok().build();
+
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // Endpoint para eliminar amigo
+    @DeleteMapping("/eliminar")
+    public ResponseEntity<?> eliminarAmigo(
+            @RequestHeader("Authorization") String token,
+            @RequestParam Long idAmigo) {
+
+        try {
+            // Obtener usuario actual del token
+            String username = jwtUtil.extractUsername(token.replace("Bearer ", ""));
+            Estudiante estudianteActual = estudianteService.buscarPorUsername(username);
+
+            // Llamar al servicio para eliminar amigo
+            estudianteService.eliminarAmigo(estudianteActual.getId(), idAmigo);
+            return ResponseEntity.ok().build();
+
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+}
