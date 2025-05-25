@@ -30,7 +30,7 @@ public class AuthController {
         this.jwtUtil = jwtUtil;
     }
 
-    @PostMapping("/login")
+    @PostMapping("/index")
     public ResponseEntity<?> login(@RequestBody AuthRequest authRequest) {
         try {
             authenticationManager.authenticate(
