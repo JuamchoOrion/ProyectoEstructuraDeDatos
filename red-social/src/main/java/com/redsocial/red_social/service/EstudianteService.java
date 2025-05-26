@@ -107,4 +107,9 @@ public class EstudianteService  {
 
         return estudiante1.getAmigos().contains(estudiante2);
     }
+
+    public Estudiante obtenerPorUsername(String username) {
+        return estudianteRepository.findByUsername(username)
+                .orElse(null);
+    }
 }

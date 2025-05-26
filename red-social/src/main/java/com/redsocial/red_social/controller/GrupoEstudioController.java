@@ -2,6 +2,7 @@ package com.redsocial.red_social.controller;
 
 import com.redsocial.red_social.dto.*;
 import com.redsocial.red_social.model.Contenido;
+import com.redsocial.red_social.model.Estudiante;
 import com.redsocial.red_social.model.GrupoEstudio;
 import com.redsocial.red_social.model.TipoContenido;
 import com.redsocial.red_social.service.*;
@@ -23,17 +24,36 @@ import java.util.Map;
 public class GrupoEstudioController {
 
     private final GrupoEstudioService grupoEstudioService;
+    private final EstudianteService estudianteService;
 
     @PostMapping("/generar")
     public ResponseEntity<Void> generarGrupos() {
         grupoEstudioService.generarGruposDeEstudio();
         return ResponseEntity.ok().build();
     }
+
     @GetMapping("/estudiante/{estudianteId}")
     public ResponseEntity<List<GrupoEstudioDTO>> obtenerGruposDeEstudiante(
             @PathVariable Long estudianteId) {
         return ResponseEntity.ok(grupoEstudioService.obtenerGruposPorEstudiante(estudianteId));
     }
+
+    @GetMapping("/mis-grupos")
+    public ResponseEntity<List<GrupoEstudioDTO>> obtenerGruposDelEstudiante(Authentication authentication) {
+        // Obtener el username desde el token JWT
+        String username = authentication.getName();
+
+        // Buscar el estudiante por su username
+        Estudiante estudiante = estudianteService.obtenerPorUsername(username);
+        if (estudiante == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // Usar el ID del estudiante para obtener los grupos
+        return ResponseEntity.ok(grupoEstudioService.obtenerGruposPorEstudiante(estudiante.getId()));
+    }
+
+
 
     @GetMapping("/{grupoId}")
     public ResponseEntity<GrupoDetalleDTO> obtenerDetallesGrupo(
