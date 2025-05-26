@@ -162,7 +162,7 @@ public class GrafoEstudiantes {
                 .build();
     }
 
-    private int calcularAfinidadConEstudiante(Long idEstudiante1, Long idEstudiante2) {
+    public int calcularAfinidadConEstudiante(Long idEstudiante1, Long idEstudiante2) {
         if (!nodos.containsKey(idEstudiante1) || !nodos.containsKey(idEstudiante2)) {
             return 0;
         }
