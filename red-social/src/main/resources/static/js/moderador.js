@@ -11,9 +11,6 @@ $(document).ready(function() {
         ajax: {
             url: 'http://localhost:8080/api/usuario/listar',
             dataSrc: '',
-            //beforeSend: function(xhr) {
-                //xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
-            //},
             error: function(xhr) {
                 console.error('Error cargando datos:', xhr.statusText);
 

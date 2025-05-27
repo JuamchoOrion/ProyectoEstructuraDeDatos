@@ -96,6 +96,9 @@ public class EstudianteService  {
 
         return new ArrayList<>(estudiante.getAmigos());
     }
+    public List<Estudiante> obtenerEstudiantesConParticipacion() {
+        return estudianteRepository.findByContenidosPublicadosIsNotEmpty();
+    }
 
     // Método para verificar si dos estudiantes son amigos
     public boolean sonAmigos(Long idEstudiante1, Long idEstudiante2) {

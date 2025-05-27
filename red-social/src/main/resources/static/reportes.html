@@ -32,7 +32,7 @@
 
     <!-- Reporte 1: Contenidos más valorados -->
     <div class="card mb-4">
-        <div class="card-header bg-success text-white">Contenidos más valorados</div>
+        <div class="card-header bg-success text-white">Contenidos mejor valorados</div>
         <div class="card-body">
             <table class="table table-bordered table-hover" id="tablaValorados">
                 <thead>
@@ -113,18 +113,15 @@
     <div class="card mb-4">
         <div class="card-header bg-dark text-white">Niveles de Participación</div>
         <div class="card-body">
-            <table class="table table-bordered table-hover" id="tablaParticipacion">
+            <table class="table table-bordered table-hover w-100" id="tablaParticipacion">
                 <thead>
                 <tr>
-                    <th>Estudiante</th>
+                    <th>Autor</th>
                     <th>Publicaciones</th>
-                    <th>Comentarios</th>
-                    <th>Reacciones</th>
-                    <th>Total Participación</th>
                 </tr>
                 </thead>
                 <tbody>
-                <!-- Contenido dinámico -->
+                <!-- Los datos se cargarán automáticamente -->
                 </tbody>
             </table>
         </div>
@@ -138,11 +135,6 @@
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script src="/js/reportes.js"></script>
-<script>
-    $(document).ready(function () {
-        $('#tablaValorados, #tablaConexiones, #tablaCaminos, #tablaComunidades, #tablaParticipacion').DataTable();
-    });
-</script>
 
 </body>
 </html>

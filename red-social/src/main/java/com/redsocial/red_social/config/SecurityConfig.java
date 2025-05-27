@@ -69,6 +69,8 @@ public class SecurityConfig {
                                 "/prueba.html",
                                 "/pruebaDetalleGrupo.html",
                                 "/pruebaPostGrupo.html",
+                                "/publicarContenido.html",
+                                "/publicarContenid.js",
                                 "pruebaGrafoFun.html",
                                 "pruebaAmigos.html"
                         ).permitAll()
@@ -103,7 +105,10 @@ public class SecurityConfig {
                                 "/api/grupos-estudio/**",
                                 "/api/contenido/mios",
                                 "/api/usuario/listar",
+                                "/api/contenido/listar",
+                                "/api/contenido/contenidosContados",
                                 "/api/grupos-estudio/estudiante/**"
+
                         ).permitAll()
 
                         // Endpoints públicos de API (DELETE)

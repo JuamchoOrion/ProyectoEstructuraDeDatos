@@ -1,5 +1,6 @@
 package com.redsocial.red_social.dto;
 
+import com.redsocial.red_social.model.Contenido;
 import com.redsocial.red_social.model.Intereses;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -18,6 +20,7 @@ public class EstudianteDTO {
     private String username;
     private String email;
     private Set<Intereses> intereses;
+    private Long publicaciones;
 
     // Constructor con 3 parámetros (opcional)
     public EstudianteDTO(Long id, String username, String email) {

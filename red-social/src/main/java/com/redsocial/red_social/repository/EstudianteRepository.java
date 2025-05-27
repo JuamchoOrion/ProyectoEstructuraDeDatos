@@ -34,7 +34,6 @@ public interface EstudianteRepository extends JpaRepository<Estudiante, Long> {
     @Query("SELECT e FROM Estudiante e")
     List<Estudiante> findAllConRelacionesCompletas();
 
-    @Query("SELECT e FROM Estudiante e LEFT JOIN FETCH e.gruposEstudio WHERE e IN :estudiantes")
-    List<Estudiante> findGruposEstudioByEstudiantes(@Param("estudiantes") List<Estudiante> estudiantes);
+    List<Estudiante> findByContenidosPublicadosIsNotEmpty();
 
 }

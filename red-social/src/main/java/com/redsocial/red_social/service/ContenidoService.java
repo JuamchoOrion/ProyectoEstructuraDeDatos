@@ -23,7 +23,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ContenidoService {
@@ -181,6 +183,13 @@ public void init() {
     public List<Contenido> obtenerTodos() {
         return arbolContenidos.obtenerTodosContenidos();
     }
+    public Long contarPublicacionesPorEstudiante(Long estudianteId) {
+        if (estudianteId == null) {
+            throw new IllegalArgumentException("El ID del estudiante no puede ser nulo");
+        }
+        return contenidoRepository.countByAutorId(estudianteId);
+    }
+
 }
 
 
