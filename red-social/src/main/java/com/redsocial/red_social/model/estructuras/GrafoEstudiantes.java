@@ -33,6 +33,7 @@ public class GrafoEstudiantes {
             nodos.get(id2).agregarVecino(nodos.get(id1));
         }
     }
+
     public List<Estudiante> obtenerRecomendaciones(Long idEstudiante) {
         List<Estudiante> recomendaciones = new ArrayList<>();
         NodoEstudiante nodo = nodos.get(idEstudiante);
@@ -104,7 +105,21 @@ public class GrafoEstudiantes {
 
         return camino;
     }
+    /**
+     * Obtiene los IDs de los estudiantes vecinos (conexiones directas) de un estudiante
+     * @param estudianteId ID del estudiante del que se quieren obtener los vecinos
+     * @return Lista de IDs de los estudiantes vecinos
+     */
+    public List<Long> obtenerVecinos(Long estudianteId) {
+        if (!nodos.containsKey(estudianteId)) {
+            return Collections.emptyList();
+        }
 
+        NodoEstudiante nodo = nodos.get(estudianteId);
+        return nodo.getVecinos().stream()
+                .map(vecino -> vecino.getEstudiante().getId())
+                .collect(Collectors.toList());
+    }
     // Algoritmo para detectar comunidades (simplificado)
     public List<List<Estudiante>> detectarComunidades() {
         List<List<Estudiante>> comunidades = new ArrayList<>();
@@ -175,6 +190,32 @@ public class GrafoEstudiantes {
                 .build();
     }
 
+
+    /**
+     * Obtiene recomendaciones de primer y segundo nivel
+     * @param estudianteId ID del estudiante
+     * @return Mapa con dos listas: primerNivel y segundoNivel
+     */
+    public Map<String, List<Long>> obtenerRecomendacionesMultiNivel(Long estudianteId) {
+        Map<String, List<Long>> resultado = new HashMap<>();
+
+        // Primer nivel: conexiones directas
+        List<Long> primerNivel = obtenerVecinos(estudianteId);
+        resultado.put("primerNivel", primerNivel);
+
+        // Segundo nivel: conexiones de conexiones (excluyendo las directas)
+        Set<Long> segundoNivel = new HashSet<>();
+        for (Long vecinoId : primerNivel) {
+            segundoNivel.addAll(obtenerVecinos(vecinoId));
+        }
+        // Eliminar al propio estudiante y sus conexiones directas
+        segundoNivel.remove(estudianteId);
+        segundoNivel.removeAll(primerNivel);
+
+        resultado.put("segundoNivel", new ArrayList<>(segundoNivel));
+
+        return resultado;
+    }
     public int calcularAfinidadConEstudiante(Long idEstudiante1, Long idEstudiante2) {
         if (!nodos.containsKey(idEstudiante1) || !nodos.containsKey(idEstudiante2)) {
             return 0;

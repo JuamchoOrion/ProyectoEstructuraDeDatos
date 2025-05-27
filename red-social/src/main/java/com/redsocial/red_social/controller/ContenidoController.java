@@ -1,6 +1,8 @@
 package com.redsocial.red_social.controller;
 
-import com.redsocial.red_social.dto.*;
+import com.redsocial.red_social.dto.ContenidoDTO;
+import com.redsocial.red_social.dto.ContenidoRequest;
+import com.redsocial.red_social.dto.ContenidoResponse;
 import com.redsocial.red_social.model.*;
 import com.redsocial.red_social.repository.ContenidoRepository;
 import com.redsocial.red_social.repository.EstudianteRepository;
@@ -23,7 +25,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -91,6 +92,7 @@ public class ContenidoController {
                     // Asegura que la URL tenga el formato correcto
                     dto.setNombreAlmacenado(contenido.getNombreAlmacenado());
                     dto.setUrl("/uploads/" + contenido.getNombreAlmacenado());
+
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -98,61 +100,37 @@ public class ContenidoController {
         return ResponseEntity.ok(resultado);
     }
 
-    @GetMapping("/listar")
-    public ResponseEntity<List<ContenidoDTO>> obtenerContenidos() {
-        List<Contenido> contenidos = contenidoService.obtenerTodos();
-        List<ContenidoDTO> resultado = contenidos.stream()
-                .map(contenido -> {
-                    ContenidoDTO dto = convertirADTO(contenido);
-                    // Asegura que la URL tenga el formato correcto
-                    dto.setNombreAlmacenado(contenido.getNombreAlmacenado());
+
+
+@GetMapping("/explorar")
+public ResponseEntity<List<ContenidoDTO>> explorarContenidos() {
+    List<Contenido> contenidos = contenidoService.obtenerTodos();
+
+    // Verificación de nulos
+    if(contenidos == null || contenidos.isEmpty()) {
+        return ResponseEntity.noContent().build();
+    }
+
+    List<ContenidoDTO> resultado = contenidos.stream()
+            .filter(Objects::nonNull) // Filtra nulos
+            .map(contenido -> {
+                ContenidoDTO dto = convertirADTO(contenido);
+                // Asegura URL válida
+                if(contenido.getNombreAlmacenado() != null) {
                     dto.setUrl("/uploads/" + contenido.getNombreAlmacenado());
-                    return dto;
-                })
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(resultado);
-    }
+                }
+                if(contenido.getTipoContenido() != null) {
+                    dto.setTipoContenido(contenido.getTipoContenido());
+                }
+                if(contenido.getInteres() != null) {
+                    dto.setInteres(contenido.getInteres());
+                }
+                return dto;
+            })
+            .collect(Collectors.toList());
 
-    @GetMapping("/contenidosContados")
-    public ResponseEntity<List<EstudianteDTO>> obtenerParticipacion() {
-        List<Estudiante> estudiantes = estudianteService.obtenerEstudiantesConParticipacion();
-
-        List<EstudianteDTO> resultado = estudiantes.stream()
-                .map(estudiante -> {
-                    EstudianteDTO dto = convertirADTOest(estudiante);
-                    dto.setPublicaciones(contenidoService.contarPublicacionesPorEstudiante(estudiante.getId()));
-                    return dto;
-                })
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(resultado);
-    }
-
-
-    @GetMapping("/explorar")
-    public ResponseEntity<List<ContenidoDTO>> explorarContenidos() {
-        List<Contenido> contenidos = contenidoService.obtenerTodos();
-
-        // Verificación de nulos
-        if (contenidos == null || contenidos.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        List<ContenidoDTO> resultado = contenidos.stream()
-                .filter(Objects::nonNull) // Filtra nulos
-                .map(contenido -> {
-                    ContenidoDTO dto = convertirADTO(contenido);
-                    // Asegura URL válida
-                    if (contenido.getNombreAlmacenado() != null) {
-                        dto.setUrl("/uploads/" + contenido.getNombreAlmacenado());
-                    }
-                    return dto;
-                })
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(resultado);
-    }
-
+    return ResponseEntity.ok(resultado);
+}
     @PostMapping("/{id}/valorar")
     public ResponseEntity<?> valorarContenido(@PathVariable Long id,
                                               @RequestBody Map<String, Integer> body,
@@ -179,34 +157,29 @@ public class ContenidoController {
         }
     }
 
-    private ContenidoDTO convertirADTO(Contenido contenido) {
+private ContenidoDTO convertirADTO(Contenido contenido) {
+    double promedio = valoracionService.calcularPromedioValoraciones(contenido);
+    return ContenidoDTO.builder()
+            .id(contenido.getId())
+            .nombreOriginal(contenido.getNombreOriginal())
+            .tipoArchivo(contenido.getTipoArchivo())
+            .tipoContenido(contenido.getTipoContenido())
+            .descripcion(contenido.getDescripcion())
+            .fechaPublicacion(contenido.getFechaPublicacion())
+            .autor(contenido.getAutor().getUsername())
+            .likes(contenido.getLikes())
+            .promedioValoracion(promedio)
+            .url("/uploads/" + contenido.getNombreAlmacenado())
+            .build();
+}
+
+    private ContenidoDTO convertirADTOConValoracion(Contenido contenido) {
         double promedio = valoracionService.calcularPromedioValoraciones(contenido);
+
         return ContenidoDTO.builder()
-                .id(contenido.getId())
-                .nombreOriginal(contenido.getNombreOriginal())
-                .tipoArchivo(contenido.getTipoArchivo())
-                .tipoContenido(contenido.getTipoContenido())
-                .descripcion(contenido.getDescripcion())
-                .fechaPublicacion(contenido.getFechaPublicacion())
-                .autor(contenido.getAutor().getUsername())
-                .likes(contenido.getLikes())
+                // ... mismos campos que el método anterior
                 .promedioValoracion(promedio)
-                .url("/uploads/" + contenido.getNombreAlmacenado())
                 .build();
     }
-    public EstudianteDTO convertirADTOest(Estudiante estudiante) {
-        // Calcular el número de publicaciones del estudiante
-        Long contadorPublicaciones = contenidoService.contarPublicacionesPorEstudiante(estudiante.getId());
-
-        return EstudianteDTO.builder()
-                .id(estudiante.getId())
-                .username(estudiante.getUsername())
-                .email(estudiante.getEmail())
-                .intereses(estudiante.getIntereses()) // Asume que Estudiante tiene getIntereses()
-                .publicaciones(contadorPublicaciones)
-                .build();
-    }
-
-
 
 }

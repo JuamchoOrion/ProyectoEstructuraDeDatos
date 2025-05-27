@@ -76,8 +76,6 @@ public class SecurityConfig {
                                 "chat.html",
                                 "/pruebaDetalleGrupo.html",
                                 "/pruebaPostGrupo.html",
-                                "/publicarContenido.html",
-                                "/publicarContenid.js",
                                 "pruebaGrafoFun.html",
                                 "pruebaAmigos.html"
                         ).permitAll()
@@ -111,16 +109,13 @@ public class SecurityConfig {
                                 "/api/solicitudes",
                                 "/api/grafo/visualizar",
                                 "/api/grafo/comunidades",
+                                "/api/grafo/recomendaciones-multinivel",
                                 "/api/grafo/recomendaciones",
-                                "/api/grafo/caminoCorto",
-                                "/api/grafo/conexiones",
+                                "/api/usuario/listarFiltrados",
                                 "/api/grupos-estudio/**",
                                 "/api/contenido/mios",
                                 "/api/usuario/listar",
-                                "/api/contenido/listar",
-                                "/api/contenido/contenidosContados",
                                 "/api/grupos-estudio/estudiante/**"
-
                         ).permitAll()
 
                         // Endpoints públicos de API (DELETE)

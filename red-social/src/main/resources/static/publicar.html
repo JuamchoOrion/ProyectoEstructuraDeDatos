@@ -2,119 +2,138 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prueba Subida de Contenido</title>
+    <title>Publicar Contenido | Aprende+</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="css/estilos.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        input, select, button {
+        .upload-details {
+            margin-top: 10px;
             padding: 10px;
-            font-size: 16px;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        #tokenInfo {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #f0f0f0;
+            background: #f8f9fa;
             border-radius: 5px;
+        }
+
+        .view-link {
+            display: inline-block;
+            margin-top: 5px;
+            color: #fff;
+            background: #007bff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+
+        .view-link:hover {
+            background: #0056b3;
         }
     </style>
 </head>
 <body>
-<h1>Prueba de Subida de Contenido</h1>
 
-<div>
-    <h3>Token JWT Actual:</h3>
-    <div id="tokenInfo">No hay token almacenado</div>
-    <button id="setTokenBtn">Simular Token</button>
-    <button id="clearTokenBtn">Limpiar Token</button>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+        <a class="navbar-brand ms-3" href="#">Aprende+</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="index.html">Inicio</a></li>
+                <li class="nav-item"><a class="nav-link" href="explorar.html">Explorar</a></li>
+                <li class="nav-item"><a class="nav-link" href="perfil.html">Perfil</a></li>
+                <li class="nav-item"><a class="nav-link" href="grupos.html">Grupos</a></li>
+                <li class="nav-item"><a class="nav-link" href="chat.html">Chat</a></li>
+                <li class="nav-item"><a class="nav-link" href="grafoPrueba.html">Grafo</a></li>
+                <li class="nav-item">
+                    <button class="btn btn-success ms-2" onclick="location.href='publicar.html'">
+                        <i class="bi bi-plus-circle"></i> Publicar Contenido
+                    </button>
+                </li>
+            </ul>
+            <button class="btn btn-outline-light ms-3" id="cerrarSesion">Cerrar Sesión</button>
+        </div>
+    </div>
+</nav>
+
+<!-- Contenido Principal -->
+<div class="container mt-5 main-content">
+    <h2 class="text-center mb-4">Publicar Nuevo Contenido</h2>
+
+    <div class="card shadow-sm p-4 mb-5 bg-white rounded">
+        <form id="formContenido" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="descripcion" class="form-label">Descripción:</label>
+                <input type="text" id="descripcion" name="descripcion" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="tipoContenido" class="form-label">Tipo de Contenido:</label>
+                <select id="tipoContenido" name="tipoContenido" class="form-select" required>
+                    <option value="">Seleccione un tipo</option>
+                    <option value="MATERIAL_ESTUDIO">Material de Estudio</option>
+                    <option value="EJERCICIOS_PRACTICOS">Ejercicios Prácticos</option>
+                    <option value="VIDEO_EDUCATIVO">Video Educativo</option>
+                    <option value="ENLACE_EXTERNO">Enlace Externo</option>
+                    <option value="PRESENTACION">Presentación</option>
+                    <option value="OTROS">Otros</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="interes" class="form-label">Interés:</label>
+                <select id="interes" name="interes" class="form-select" required>
+                    <option value="">Seleccione un interés</option>
+                    <option value="MATEMATICAS">MATEMATICAS</option>
+                    <option value="FISICA">FISICA</option>
+                    <option value="BIOLOGIA">BIOLOGIA</option>
+                    <option value="SOCIALES">SOCIALES</option>
+                    <option value="ETICA">ETICA</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="archivo" class="form-label">Archivo:</label>
+                <input type="file" id="archivo" name="archivo" class="form-control" required>
+            </div>
+
+            <div class="text-end">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-upload"></i> Subir Contenido
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div id="response"></div>
 </div>
 
-<hr>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<form id="formContenido" enctype="multipart/form-data">
-    <div>
-        <label for="descripcion">Descripción:</label>
-        <input type="text" id="descripcion" name="descripcion" required>
-    </div>
-
-    <div>
-        <label for="tipoContenido">Tipo de Contenido:</label>
-        <select id="tipoContenido" name="tipoContenido" required>
-            <option value="">Seleccione un tipo</option>
-            <option value="MATERIAL_ESTUDIO">Material de Estudio</option>
-            <option value="EJERCICIOS_PRACTICOS">Ejercicios Prácticos</option>
-            <option value="VIDEO_EDUCATIVO">Video Educativo</option>
-            <option value="ENLACE_EXTERNO">Enlace Externo</option>
-            <option value="PRESENTACION">Presentación</option>
-            <option value="OTROS">Otros</option>
-        </select>
-    </div>
-    <div>
-        <label for="interes">Interés:</label>
-        <select id="interes" name="interes" required>
-            <option value="">Seleccione un interés</option>
-            <option value="MATEMATICAS">MATEMATICAS</option>
-            <option value="FISICA">FISICA</option>
-            <option value="BIOLOGIA">BIOLOGIA</option>
-            <option value="SOCIALES">SOCIALES</option>
-            <option value="ETICA">ETICA</option>
-            <!-- Agrega más opciones según tu enum -->
-        </select>
-    </div>
-
-
-    <div>
-        <label for="archivo">Archivo:</label>
-        <input type="file" id="archivo" name="archivo" required>
-    </div>
-
-    <button type="submit">Subir Contenido</button>
-</form>
-
-<div id="response" style="margin-top: 20px;"></div>
 <script>
-    // Mostrar el token actual
-    function updateTokenDisplay() {
-        const token = localStorage.getItem('token');
-        document.getElementById('tokenInfo').textContent = token || 'No hay token almacenado';
-    }
-
-    // Simular un token (para pruebas)
-    document.getElementById('setTokenBtn').addEventListener('click', () => {
-        localStorage.setItem('token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqdWFuY2hvIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c');
-        updateTokenDisplay();
-        alert('Token de prueba establecido');
-    });
-
-    // Limpiar token
-    document.getElementById('clearTokenBtn').addEventListener('click', () => {
-        localStorage.removeItem('token');
-        updateTokenDisplay();
-        alert('Token eliminado');
-    });
-
-    // Manejar el envío del formulario
     document.addEventListener("DOMContentLoaded", () => {
-        updateTokenDisplay();
+        // Manejar el cierre de sesión
+        document.getElementById('cerrarSesion')?.addEventListener('click', () => {
+            localStorage.removeItem('token');
+            window.location.href = 'index.html';
+        });
 
+        // Verificar autenticación
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = 'index.html';
+            return;
+        }
+
+        // Manejar el envío del formulario
         const form = document.getElementById("formContenido");
         const responseDiv = document.getElementById('response');
         const submitBtn = form.querySelector('button[type="submit"]');
@@ -124,14 +143,7 @@
 
             // Deshabilitar botón durante el envío
             submitBtn.disabled = true;
-            responseDiv.innerHTML = '<p class="upload-status">Subiendo contenido...</p>';
-
-            const token = localStorage.getItem("token");
-            if (!token) {
-                responseDiv.innerHTML = '<p class="error">Error: No hay token disponible. Por favor inicia sesión.</p>';
-                submitBtn.disabled = false;
-                return;
-            }
+            responseDiv.innerHTML = '<div class="alert alert-info">Subiendo contenido...</div>';
 
             try {
                 const formData = new FormData(form);
@@ -146,54 +158,32 @@
                 if (response.ok) {
                     const data = await response.json();
                     responseDiv.innerHTML = `
-                        <p class="success">¡Contenido subido con éxito!</p>
-                        <div class="upload-details">
-                            <p><strong>ID:</strong> ${data.contentId}</p>
-                            <p><strong>Archivo:</strong> ${data.nombreOriginal}</p>
-                            <a href="${data.url}" target="_blank" class="view-link">Ver contenido</a>
+                        <div class="alert alert-success">
+                            <p><strong><i class="bi bi-check-circle"></i> ¡Contenido subido con éxito!</strong></p>
+                            <div class="upload-details">
+                                <p><strong>ID:</strong> ${data.contentId}</p>
+                                <p><strong>Archivo:</strong> ${data.nombreOriginal}</p>
+                                <a href="${data.url}" target="_blank" class="view-link">
+                                    <i class="bi bi-eye"></i> Ver contenido
+                                </a>
+                            </div>
                         </div>
                     `;
                     // Limpiar formulario después de éxito
                     form.reset();
                 } else {
                     const error = await response.text();
-                    responseDiv.innerHTML = `<p class="error">Error (${response.status}): ${error}</p>`;
+                    responseDiv.innerHTML = `<div class="alert alert-danger"><i class="bi bi-exclamation-triangle"></i> Error (${response.status}): ${error}</div>`;
                 }
             } catch (error) {
-                responseDiv.innerHTML = `<p class="error">Error de conexión: ${error.message}</p>`;
+                responseDiv.innerHTML = `<div class="alert alert-danger"><i class="bi bi-exclamation-triangle"></i> Error de conexión: ${error.message}</div>`;
                 console.error("Error:", error);
             } finally {
                 submitBtn.disabled = false;
             }
         });
     });
-
-    // Estilos inline para los mensajes
-    const style = document.createElement('style');
-    style.textContent = `
-        .error { color: #dc3545; }
-        .success { color: #28a745; font-weight: bold; }
-        .upload-status { color: #17a2b8; }
-        .upload-details {
-            margin-top: 10px;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 5px;
-        }
-        .view-link {
-            display: inline-block;
-            margin-top: 5px;
-            color: #fff;
-            background: #007bff;
-            padding: 5px 10px;
-            border-radius: 4px;
-            text-decoration: none;
-        }
-        .view-link:hover {
-            background: #0056b3;
-        }
-    `;
-    document.head.appendChild(style);
 </script>
+
 </body>
 </html>

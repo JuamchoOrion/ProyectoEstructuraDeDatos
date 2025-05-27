@@ -74,6 +74,14 @@ public class UsuarioController {
     public ResponseEntity<List<UsuarioDTO>> listarUsuarios() {
         return ResponseEntity.ok(usuarioService.obtenerTodos());
     }
+    @GetMapping("/listarFiltrados")
+    public ResponseEntity<List<UsuarioDTO>> listarUsuariosFiltrado(
+            Authentication authentication
+    ) {
+        String username = authentication.getName();
+         return ResponseEntity.ok(usuarioService.obtenerTodosFiltrado(username));
+    }
+
 
     @PostMapping("/{id}/intereses")
     public ResponseEntity<?> agregarInteres(

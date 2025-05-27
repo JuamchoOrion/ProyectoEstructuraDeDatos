@@ -1,102 +1,258 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Chat</title>
+    <title>Chat | Aprende+</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
         body {
-            font-family: Arial;
+            font-family: Arial, sans-serif;
             margin: 0;
+            padding: 0;
             display: flex;
+            flex-direction: column;
             height: 100vh;
+            background-color: #f8f9fa;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
         }
 
         #sidebar {
-            width: 200px;
-            background-color: #f0f0f0;
-            border-right: 1px solid #ccc;
+            width: 250px;
+            background-color: white;
+            border-right: 1px solid #dee2e6;
             overflow-y: auto;
-            padding: 10px;
+            padding: 15px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
         }
 
         #sidebar h3 {
-            margin-top: 0;
+            color: #495057;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 15px;
         }
 
         .amigo {
-            padding: 8px;
-            margin-bottom: 5px;
-            background-color: #e2e2e2;
+            padding: 10px;
+            margin-bottom: 8px;
+            background-color: #f8f9fa;
             cursor: pointer;
-            border-radius: 5px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .amigo:hover {
-            background-color: #ccc;
+            background-color: #e9ecef;
+            transform: translateX(3px);
+        }
+
+        .amigo.active {
+            background-color: #007bff;
+            color: white;
         }
 
         #chat-container {
-            flex-grow: 1;
+            flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 20px;
-            background: #f9f9f9;
+            background-color: white;
+        }
+
+        #chat-header {
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #chat-header i {
+            font-size: 1.5rem;
+            color: #007bff;
         }
 
         #chat-box {
-            flex-grow: 1;
+            flex: 1;
             overflow-y: auto;
-            padding: 10px;
-            background: white;
-            border: 1px solid #ddd;
+            padding: 20px;
+            background-color: #f8f9fa;
         }
 
         .message {
-            margin: 5px 0;
-            padding: 5px 10px;
-            border-radius: 10px;
+            margin: 10px 0;
+            padding: 12px 15px;
+            border-radius: 12px;
             max-width: 70%;
             clear: both;
+            position: relative;
+            word-wrap: break-word;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
 
         .sent {
             background: #d1e7dd;
             float: right;
+            border-bottom-right-radius: 0;
         }
 
         .received {
             background: #f8d7da;
             float: left;
+            border-bottom-left-radius: 0;
         }
 
-        #formulario {
+        .message-info {
+            font-size: 0.8em;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .sent .message-info {
+            text-align: right;
+        }
+
+        .received .message-info {
+            text-align: left;
+        }
+
+        #message-form {
             display: flex;
-            gap: 5px;
-            margin-top: 10px;
+            padding: 15px;
+            background-color: white;
+            border-top: 1px solid #dee2e6;
         }
 
-        #formulario input, #formulario button {
-            padding: 10px;
-            font-size: 1em;
+        #message {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ced4da;
+            border-radius: 20px;
+            outline: none;
+            transition: border-color 0.2s;
         }
 
+        #message:focus {
+            border-color: #007bff;
+        }
+
+        #send-button {
+            margin-left: 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #send-button:hover {
+            background-color: #0056b3;
+        }
+
+        .empty-chat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #6c757d;
+            text-align: center;
+        }
+
+        .empty-chat i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #dee2e6;
+        }
+
+        .timestamp {
+            font-size: 0.7em;
+            color: #6c757d;
+            margin-top: 3px;
+        }
+
+        .sent .timestamp {
+            text-align: right;
+        }
+
+        .received .timestamp {
+            text-align: left;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 </head>
 <body>
 
-<div id="sidebar">
-    <h3>Amigos</h3>
-    <div id="amigos-list"></div>
-</div>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Aprende+</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="index.html">Inicio</a></li>
+                <li class="nav-item"><a class="nav-link" href="explorar.html">Explorar</a></li>
+                <li class="nav-item"><a class="nav-link" href="perfil.html">Perfil</a></li>
+                <li class="nav-item"><a class="nav-link" href="grupos.html">Grupos</a></li>
+                <li class="nav-item"><a class="nav-link" href="mensajes.html">Mensajes</a></li>
+                <li class="nav-item">
+                    <button class="btn btn-success ms-2" onclick="location.href='publicar.html'">
+                        <i class="bi bi-plus-circle"></i> Publicar
+                    </button>
+                </li>
+            </ul>
+            <button class="btn btn-outline-light ms-3" id="cerrarSesion">
+                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+            </button>
+        </div>
+    </div>
+</nav>
 
-<div id="chat-container">
-    <h2 id="titulo-chat">Selecciona un amigo</h2>
-    <div id="chat-box"></div>
+<!-- Contenido Principal -->
+<div class="main-container">
+    <!-- Sidebar de amigos -->
+    <div id="sidebar">
+        <h3><i class="bi bi-people-fill"></i> Amigos</h3>
+        <div id="amigos-list">
+            <!-- Se llenará dinámicamente -->
+        </div>
+    </div>
 
-    <div id="formulario">
-        <input type="text" id="message" placeholder="Mensaje">
-        <button onclick="sendMessage()">Enviar</button>
+    <!-- Área de chat -->
+    <div id="chat-container">
+        <div id="chat-header">
+            <i class="bi bi-chat-dots"></i>
+            <h4 id="titulo-chat">Selecciona un amigo para chatear</h4>
+        </div>
+
+        <div id="chat-box">
+            <div class="empty-chat">
+                <i class="bi bi-chat-square-text"></i>
+                <p>Selecciona un amigo para comenzar a chatear</p>
+            </div>
+        </div>
+
+        <!-- Por esto: -->
+        <div id="message-form">
+            <input type="text" id="message" placeholder="Escribe un mensaje...">
+            <button type="button" id="send-button" onclick="sendMessage()">
+                <i class="bi bi-send"></i> Enviar
+            </button>
+        </div>
     </div>
 </div>
 
@@ -109,14 +265,27 @@
     let reconectando = false;
     let stompClient = null;
 
+    // Elementos del DOM
     const amigosList = document.getElementById('amigos-list');
     const chatBox = document.getElementById('chat-box');
     const tituloChat = document.getElementById('titulo-chat');
     const messageInput = document.getElementById('message');
+    const sendButton = document.getElementById('send-button');
 
     // Iniciar conexión WebSocket al cargar la página
     document.addEventListener('DOMContentLoaded', function() {
+        if (!token) {
+            window.location.href = 'index.html';
+            return;
+        }
+
         conectarWebSocket();
+
+        // Configurar cierre de sesión
+        document.getElementById('cerrarSesion').addEventListener('click', function() {
+            localStorage.removeItem('token');
+            window.location.href = 'index.html';
+        });
     });
 
     // Función para conectar WebSocket
@@ -129,8 +298,6 @@
             function(frame) {
                 console.log('Conectado:', frame);
                 reconectando = false;
-
-                // Obtener información del usuario actual
                 obtenerUsuarioActual();
             },
             function(error) {
@@ -188,7 +355,10 @@
                 amigos.forEach(amigo => {
                     const div = document.createElement('div');
                     div.classList.add('amigo');
-                    div.textContent = amigo.nombre;
+                    div.innerHTML = `
+                        <i class="bi bi-person-circle"></i>
+                        <span>${amigo.nombre}</span>
+                    `;
                     div.onclick = () => abrirChatCon(amigo.id, amigo.nombre);
                     amigosList.appendChild(div);
                 });
@@ -201,9 +371,14 @@
 
     // Abrir chat con un amigo
     function abrirChatCon(id, nombre) {
+        // Resaltar amigo seleccionado
+        const amigos = document.querySelectorAll('.amigo');
+        amigos.forEach(a => a.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+
         receptorId = id;
         amigoSeleccionadoNombre = nombre;
-        tituloChat.textContent = `Chat con ${nombre}`;
+        tituloChat.innerHTML = `<i class="bi bi-person-fill"></i> Chat con ${nombre}`;
         chatBox.innerHTML = '';
 
         fetch(`/chat/${id}`, {
@@ -214,77 +389,121 @@
                 return res.json();
             })
             .then(mensajes => {
+                if (mensajes.length === 0) {
+                    chatBox.innerHTML = `
+                        <div class="empty-chat">
+                            <i class="bi bi-chat-square-text"></i>
+                            <p>No hay mensajes con ${nombre}</p>
+                            <small>Envía el primer mensaje</small>
+                        </div>
+                    `;
+                    return;
+                }
+
                 mensajes.forEach(msg => {
                     msg.emisorNombre = msg.emisorId === currentUserId ? "Tú" : nombre;
                     mostrarMensaje(msg, msg.emisorId === currentUserId);
                 });
+                chatBox.scrollTop = chatBox.scrollHeight;
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error al cargar historial de chat');
+                chatBox.innerHTML = `
+                    <div class="empty-chat">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <p>Error al cargar el chat</p>
+                        <small>${error.message}</small>
+                    </div>
+                `;
             });
     }
 
     // Mostrar mensaje en el chat
     function mostrarMensaje(msg, enviado) {
+        // Eliminar el mensaje de chat vacío si existe
+        if (chatBox.querySelector('.empty-chat')) {
+            chatBox.innerHTML = '';
+        }
+
+        const fecha = new Date(msg.fechaEnvio || Date.now());
+        const hora = fecha.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
         const wrapper = document.createElement('div');
         wrapper.style.clear = "both";
 
-        const nombre = document.createElement('div');
-        nombre.style.fontSize = '0.8em';
-        nombre.style.fontWeight = 'bold';
-        nombre.style.marginBottom = '2px';
-        nombre.textContent = enviado ? "Tú" : msg.emisorNombre || "Desconocido";
-        nombre.style.textAlign = enviado ? 'right' : 'left';
-
         const div = document.createElement('div');
         div.classList.add('message', enviado ? 'sent' : 'received');
-        div.textContent = msg.contenido;
 
-        wrapper.appendChild(nombre);
+        const infoDiv = document.createElement('div');
+        infoDiv.classList.add('message-info');
+        infoDiv.textContent = enviado ? "Tú" : msg.emisorNombre || "Desconocido";
+
+        const contentDiv = document.createElement('div');
+        contentDiv.textContent = msg.contenido;
+
+        const timeDiv = document.createElement('div');
+        timeDiv.classList.add('timestamp');
+        timeDiv.textContent = hora;
+
+        div.appendChild(infoDiv);
+        div.appendChild(contentDiv);
+        div.appendChild(timeDiv);
         wrapper.appendChild(div);
         chatBox.appendChild(wrapper);
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // Enviar mensaje
     function sendMessage() {
         if (!stompClient || !stompClient.connected) {
             alert('No estás conectado. Intentando reconectar...');
             conectarWebSocket();
-            return;
+            return false;
         }
 
         const contenido = messageInput.value.trim();
         if (!receptorId || !contenido) {
-            alert('Selecciona un amigo y escribe un mensaje');
-            return;
+            if (!receptorId) alert('Selecciona un amigo para chatear');
+            return false;
         }
 
         const mensaje = {
             receptorId: receptorId,
             contenido: contenido,
             emisorId: currentUserId,
-            emisorNombre: "Tú"
+            emisorNombre: "Tú",
+            fechaEnvio: new Date().toISOString()
         };
 
         try {
-            stompClient.send("/app/enviar", {}, JSON.stringify(mensaje));
+            // 1. Mostrar el mensaje inmediatamente
             mostrarMensaje(mensaje, true);
+
+            // 2. Enviar el mensaje al servidor
+            stompClient.send("/app/enviar", {}, JSON.stringify(mensaje));
+
+            // 3. Limpiar el input
             messageInput.value = '';
+
+            // 4. Enfocar nuevamente el input para seguir escribiendo
+            messageInput.focus();
         } catch (error) {
             console.error('Error al enviar mensaje:', error);
             alert('Error al enviar mensaje. Intenta nuevamente.');
         }
+        return false;
     }
 
-    // Permitir enviar mensaje con Enter
+
+    // Por esto:
     messageInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
+            e.preventDefault(); // Previene el comportamiento por defecto del formulario
             sendMessage();
         }
     });
 </script>
 
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

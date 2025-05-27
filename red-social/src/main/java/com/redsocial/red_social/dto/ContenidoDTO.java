@@ -27,6 +27,7 @@ public class ContenidoDTO {
     private String autor;
     private Double promedioValoracion;
     private String url;
+    private Intereses interes;
 
     private String nombreAlmacenado;
 
