@@ -46,11 +46,14 @@ public class SecurityConfig {
                                 "/login.html",
                                 "/registro.html",
                                 "/perfil.html",
+                                "/perfil.js",
                                 "/loginModerador.html",
                                 "/registroModeradores.html",
                                 "/moderador.html",
+                                "/grupo-detalle.html",
                                 "/grafo.html",
                                 "/publicar.html",
+                                "/publicarContenido.js",
                                 "/solicitudAyuda.html",
                                 "/css/**",
                                 "/js/**",
@@ -66,7 +69,11 @@ public class SecurityConfig {
                                 "/crearEstudiante.js",
                                 "/solicitudAyuda.js",
                                 "/grafoPrueba.html",
+                                "/grafo.js",
+                                "/grupos.html",
+                                "/grupos.js",
                                 "/prueba.html",
+                                "chat.html",
                                 "/pruebaDetalleGrupo.html",
                                 "/pruebaPostGrupo.html",
                                 "/publicarContenido.html",
@@ -90,7 +97,8 @@ public class SecurityConfig {
                                 "/api/grupos-estudio/generar",
                                 "/api/usuario/agregar"
                         ).permitAll()
-
+                        .requestMatchers("/chat-websocket/**").permitAll()  // handshake SockJS
+                        .requestMatchers("/tema/**").permitAll()            // destino de mensajes STOMP
                         // Endpoints públicos de API (GET)
                         .requestMatchers(HttpMethod.GET,
                                 "/api/verify",
@@ -98,6 +106,8 @@ public class SecurityConfig {
                                 "/uploads/**",
                                 "/api/contenido/explorar",
                                 "/api/solicitudes/urgentes",
+                                "/chat/*",
+                                "/api/usuario/amigos",
                                 "/api/solicitudes",
                                 "/api/grafo/visualizar",
                                 "/api/grafo/comunidades",

@@ -175,4 +175,31 @@ public class UsuarioController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(Authentication authentication) {
+        String username = authentication.getName();
+        Estudiante estudiante = estudianteRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        return ResponseEntity.ok(Map.of("id", estudiante.getId(), "username", estudiante.getUsername()));
+    }
+
+    @GetMapping("/amigos")
+    public ResponseEntity<?> getAmigos(Authentication authentication) {
+        String username = authentication.getName();
+        Estudiante estudiante = estudianteRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        List<Map<String, Object>> amigos = estudiante.getAmigos().stream().map(amigo -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", amigo.getId());
+            map.put("nombre", amigo.getUsername()); // o getUsername(), si prefieres
+            return map;
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(amigos);
+    }
+
+
 }

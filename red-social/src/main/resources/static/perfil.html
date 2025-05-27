@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8" />
     <title>Perfil | Aprende+</title>
@@ -8,21 +8,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
-        <!-- Barra de búsqueda alineada a la izquierda -->
         <a class="navbar-brand ms-3" href="#">Aprende+</a>
-        <form class="d-flex me-auto" id="formBusqueda" role="search">
-            <input class="form-control me-2" type="search" placeholder="Buscar por tema, autor o tipo" aria-label="Buscar" id="barraBusqueda" />
-            <button class="btn btn-light" type="submit" id="botonBuscar">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                    <path d="M11 6a5 5 0 1 1-10 0 5 5 0 0 1 10 0z"/>
-                    <path d="M15.7 14.3l-3.9-3.9a6.5 6.5 0 1 0-1.4 1.4l3.9 3.9a1 1 0 0 0 1.4-1.4z"/>
-                </svg>
-            </button>
-        </form>
+
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -34,8 +26,9 @@
                 <li class="nav-item"><a class="nav-link" href="explorar.html">Explorar</a></li>
                 <li class="nav-item"><a class="nav-link" href="perfil.html">Perfil</a></li>
                 <li class="nav-item"><a class="nav-link" href="grupos.html">Grupos</a></li>
-                <li class="nav-item"><a class="nav-link" href="mensajes.html">Mensajes</a></li>
-                <!-- Nuevo botón en la navbar -->
+
+                <li class="nav-item"><a class="nav-link" href="chat.html">Chat</a></li>
+                <li class="nav-item"><a class="nav-link" href="grafoPrueba.html">Grafo</a></li>
                 <li class="nav-item">
                     <button class="btn btn-success ms-2" onclick="location.href='publicar.html'">
                         <i class="bi bi-plus-circle"></i> Publicar Contenido
@@ -46,10 +39,11 @@
         </div>
     </div>
 </nav>
+
+
 <!-- Contenido principal -->
 <div class="container-fluid mt-4">
     <div class="row">
-
         <!-- Panel izquierdo -->
         <div class="col-md-3 mb-4">
             <div class="card shadow-sm">
@@ -57,60 +51,143 @@
                     <img src="https://via.placeholder.com/100" class="rounded-circle mb-3" alt="Foto Usuario" />
                     <h5 id="nombreUsuario">Usuario</h5>
                     <hr />
-                    <button class="btn btn-outline-primary w-100 mb-2" onclick="location.href='solicitud.html'">
+                    <button class="btn btn-outline-primary w-100 mb-2" onclick="location.href='solicitudAyuda.html'">
                         <i class="bi bi-question-circle"></i> Solicitar Ayuda
                     </button>
-                    <button class="btn btn-outline-success w-100 mb-2" onclick="location.href='publicar_contenido.html'">
+                    <button class="btn btn-outline-success w-100 mb-2" onclick="location.href='publicar.html'">
                         <i class="bi bi-plus-circle"></i> Publicar Contenido
                     </button>
                     <button class="btn btn-outline-warning w-100 mb-3" onclick="location.href='grupos.html'">
                         <i class="bi bi-people-fill"></i> Grupos Sugeridos
                     </button>
+                    <div class="mb-3">
+                        <h6 class="bg-primary text-white p-2 rounded text-center">Agregar Amigos</h6>
+                        <div class="input-group mb-3">
+                            <select class="form-select" id="comboUsuarios">
+                                <option selected disabled>Selecciona un usuario</option>
+                                <!-- Las opciones se cargarán dinámicamente -->
+                            </select>
+                            <button class="btn btn-success" type="button" id="btnAgregarAmigo">
+                                <i class="bi bi-person-plus"></i>
+                            </button>
+                        </div>
+                        <div id="mensajeAmigo" class="small text-center"></div>
+                    </div>
+                    <div class="section">
+                        <h6>Generar Grupos Automáticamente</h6>
+                        <button class="btn btn-primary w-100 mb-2" onclick="generarGrupos()">Generar Grupos</button>
+                        <div id="resultGenerar"></div>
+                    </div>
 
-                    <!-- Compañeros Sugeridos -->
+
                     <div class="mt-4 text-start">
                         <h6 class="bg-info text-white p-2 rounded text-center">Compañeros Sugeridos</h6>
                         <p class="text-muted small text-center">Basado en intereses similares</p>
-                        <div id="contenedorSugerencias">
-                            <!-- Aquí se cargará desde JS -->
-                        </div>
+                        <div id="contenedorSugerencias"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Panel derecho: Contenidos -->
+        <!-- Panel derecho: Contenidos y recomendaciones -->
         <div class="col-md-9">
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-secondary text-white">
-                    Contenidos Publicados
-                </div>
-                <div class="card-body" id="contenedorContenidos">
-                    <!-- Aquí se insertarán los contenidos desde JS -->
+                <div class="card-header bg-secondary text-white">Contenidos Publicados</div>
+                <div class="card-body" id="contenedorContenidos"></div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-danger text-white">Solicitudes de Ayuda Urgentes</div>
+                <div class="card-body" id="contenedorSolicitudesAyuda"></div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-success text-white">Recomendaciones de Estudiantes</div>
+                <div class="card-body" id="contenedorRecomendaciones">
+                    <p class='text-muted'>Cargando recomendaciones...</p>
                 </div>
             </div>
         </div>
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-danger text-white">
-                Solicitudes de Ayuda Urgentes
-            </div>
-            <div class="card-body" id="contenedorSolicitudesAyuda">
-                <!-- Aquí se mostrarán las solicitudes -->
-            </div>
-        </div>
-
-    </div> <!-- Fin de .row -->
-</div> <!-- Fin de .container-fluid -->
-
-
-</div>
+    </div>
 </div>
 
-
-
-<!-- Agregamos los iconos de Bootstrap Icons -->
+<!-- <script src="js/perfil.js"></script> -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="js/perfil.js"></script>
+<script>
+    async function cargarRecomendaciones(token) {
+        try {
+            const response = await fetch("/api/grafo/recomendaciones", {
+                headers: { "Authorization": token }
+            });
+            const contenedor = document.getElementById("contenedorRecomendaciones");
+            if (!response.ok) {
+                contenedor.innerHTML = "<p class='text-danger'>No se pudieron cargar las recomendaciones.</p>";
+                return;
+            }
+
+            const data = await response.json();
+            if (data.length === 0) {
+                contenedor.innerHTML = "<p class='text-muted'>No hay recomendaciones en este momento.</p>";
+                return;
+            }
+
+            contenedor.innerHTML = "";
+            data.forEach(est => {
+                const card = document.createElement("div");
+                card.className = "border rounded p-2 mb-2 shadow-sm";
+                card.innerHTML = `
+                    <h6 class="mb-1"><i class="bi bi-person-circle"></i> ${est.username}</h6>
+                    <p class="mb-1"><strong>Email:</strong> ${est.email}</p>
+                    <p class="mb-0"><strong>Intereses:</strong> ${(est.intereses || []).map(i => i.nombre).join(", ")}</p>
+                `;
+                contenedor.appendChild(card);
+            });
+        } catch (err) {
+            document.getElementById("contenedorRecomendaciones").innerHTML = "<p class='text-danger'>Error al cargar recomendaciones.</p>";
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const token = localStorage.getItem("token");
+        if (token && token.startsWith("Bearer ")) {
+            cargarRecomendaciones(token);
+        }
+    });
+
+    const API_BASE_URL = 'http://localhost:8080/api/grupos-estudio';
+
+    function showMessage(elementId, message, isError = false) {
+        const element = document.getElementById(elementId);
+        const messageClass = isError ? 'error' : 'success';
+        element.innerHTML = `<p class="${messageClass}">${message}</p>`;
+    }
+
+    function showLoading(elementId) {
+        const element = document.getElementById(elementId);
+        element.innerHTML = '<p class="loading">Procesando...</p>';
+    }
+
+    async function generarGrupos() {
+        showLoading('resultGenerar');
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/generar`, {
+                method: 'POST'
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || 'Error al generar grupos');
+            }
+
+            showMessage('resultGenerar', '¡Grupos generados exitosamente!');
+        } catch (error) {
+            showMessage('resultGenerar', error.message, true);
+        }
+    }
+
+</script>
 </body>
 </html>

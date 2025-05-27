@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Detalles del Grupo | Aprende+</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+  <style>
+    .contenido-card {
+      transition: transform 0.2s;
+    }
+    .contenido-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .file-icon {
+      font-size: 3rem;
+    }
+    .solicitud-card {
+      border-left: 4px solid #dc3545;
+    }
+  </style>
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container-fluid">
+    <a class="navbar-brand ms-3" href="#">Aprende+</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item"><a class="nav-link" href="index.html">Inicio</a></li>
+        <li class="nav-item"><a class="nav-link" href="explorar.html">Explorar</a></li>
+        <li class="nav-item"><a class="nav-link" href="perfil.html">Perfil</a></li>
+        <li class="nav-item"><a class="nav-link" href="grupos.html">Grupos</a></li>
+        <li class="nav-item"><a class="nav-link" href="chat.html">Chat</a></li>
+        <li class="nav-item"><a class="nav-link" href="grafoPrueba.html">Grafo</a></li>
+        <li class="nav-item">
+          <button class="btn btn-success ms-2" onclick="location.href='publicar.html'">
+            <i class="bi bi-plus-circle"></i> Publicar
+          </button>
+        </li>
+      </ul>
+      <button class="btn btn-outline-light ms-3" id="cerrarSesion">Cerrar Sesión</button>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid mt-4">
+  <div class="row">
+    <!-- Panel izquierdo -->
+    <div class="col-md-3 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h4 id="nombreGrupo" class="text-center mb-3">Grupo</h4>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Interés:</span>
+            <span id="interesGrupo" class="badge bg-primary"></span>
+          </div>
+          <div class="d-flex justify-content-between mb-3">
+            <span class="text-muted">Miembros:</span>
+            <span id="miembrosGrupo" class="badge bg-secondary"></span>
+          </div>
+          <hr>
+
+          <!-- Formulario para subir contenido -->
+          <h5 class="mb-3"><i class="bi bi-upload"></i> Subir Contenido</h5>
+          <form id="formSubirContenido" enctype="multipart/form-data">
+            <div class="mb-3">
+              <label for="archivo" class="form-label">Archivo</label>
+              <input class="form-control" type="file" id="archivo" required>
+            </div>
+            <div class="mb-3">
+              <label for="descripcion" class="form-label">Descripción</label>
+              <textarea class="form-control" id="descripcion" rows="2" required></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="tipoContenido" class="form-label">Tipo de contenido</label>
+              <select class="form-select" id="tipoContenido" required>
+                <option value="">Seleccionar...</option>
+                public enum TipoContenido {
+                MATERIAL_ESTUDIO,
+                EJERCICIOS_PRACTICOS,
+                VIDEO_EDUCATIVO,
+                ENLACE_EXTERNO,
+                PRESENTACION,
+                OTROS
+                }
+                <option value="MATERIAL_ESTUDIO">Material</option>
+                <option value="EJERCICIOS_PRACTICOS">Ejercicios</option>
+                <option value="VIDEO_EDUCATIVO">Videos</option>
+                <option value="ENLACE_EXTERNO">Enlaces</option>
+                <option value="PRESENTACION">Presentacion</option>
+                <option value="OTROS">Otros</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="bi bi-upload"></i> Subir
+            </button>
+          </form>
+
+          <hr>
+
+          <!-- Formulario para solicitud de ayuda -->
+          <h5 class="mb-3"><i class="bi bi-question-circle"></i> Solicitar Ayuda</h5>
+          <form id="formSolicitudAyuda">
+            <div class="mb-3">
+              <label for="peticion" class="form-label">Petición</label>
+              <textarea class="form-control" id="peticion" rows="2" required></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="fechaNecesidad" class="form-label">Fecha de necesidad</label>
+              <input type="date" class="form-control" id="fechaNecesidad" required>
+            </div>
+            <button type="submit" class="btn btn-warning w-100">
+              <i class="bi bi-send"></i> Enviar Solicitud
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel derecho -->
+    <div class="col-md-9">
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+          <span>Contenidos del Grupo</span>
+          <button class="btn btn-sm btn-light" onclick="cargarDetallesGrupo()">
+            <i class="bi bi-arrow-clockwise"></i> Actualizar
+          </button>
+        </div>
+        <div class="card-body">
+          <div id="contenidosContainer" class="row">
+            <!-- Aquí se cargarán los contenidos -->
+            <div class="col-12 text-center py-4">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+              </div>
+              <p class="mt-2">Cargando contenidos...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm">
+        <div class="card-header bg-danger text-white">
+          Solicitudes de Ayuda
+        </div>
+        <div class="card-body">
+          <div id="solicitudesContainer">
+            <!-- Aquí se cargarán las solicitudes -->
+            <div class="text-center py-4">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+              </div>
+              <p class="mt-2">Cargando solicitudes...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Obtener ID del grupo de la URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const grupoId = urlParams.get('id');
+
+  // Función para obtener token
+  function getToken() {
+    return localStorage.getItem('token');
+  }
+
+  // Función para mostrar mensajes
+  function showMessage(elementId, message, isError = false) {
+    const element = document.getElementById(elementId);
+    element.innerHTML = `<div class="alert alert-dismissible ${isError ? 'alert-danger' : 'alert-success'}">
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>`;
+  }
+
+  // Función para cargar detalles del grupo
+  async function cargarDetallesGrupo() {
+    if (!grupoId) {
+      window.location.href = 'grupos.html';
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/grupos-estudio/${grupoId}`, {
+        headers: {
+          'Authorization': getToken()
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al cargar detalles del grupo');
+      }
+
+      const grupo = await response.json();
+
+      // Actualizar información del grupo
+      document.getElementById('nombreGrupo').textContent = `Grupo #${grupo.id}`;
+      document.getElementById('interesGrupo').textContent = grupo.interes || 'General';
+      document.getElementById('miembrosGrupo').textContent = grupo.miembros ? grupo.miembros.length : 0;
+
+      // Mostrar contenidos
+      mostrarContenidos(grupo.contenidos || []);
+
+      // Mostrar solicitudes
+      mostrarSolicitudes(grupo.solicitudes || []);
+
+    } catch (error) {
+      console.error('Error:', error);
+      showMessage('contenidosContainer', error.message, true);
+    }
+  }
+
+  // Función para mostrar contenidos
+  function mostrarContenidos(contenidos) {
+    const container = document.getElementById('contenidosContainer');
+
+    if (contenidos.length === 0) {
+      container.innerHTML = `
+            <div class="col-12 text-center py-4">
+                <i class="bi bi-folder-x fs-1 text-muted"></i>
+                <h5 class="mt-3">No hay contenidos compartidos</h5>
+                <p class="text-muted">Sé el primero en compartir algo</p>
+            </div>
+        `;
+      return;
+    }
+
+    container.innerHTML = contenidos.map(contenido => `
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card contenido-card h-100">
+                <div class="card-body text-center">
+                    <i class="${getFileIconClass(contenido.tipoArchivo, contenido.nombreOriginal)} file-icon mb-3"></i>
+                    <h5 class="card-title">${contenido.nombreOriginal}</h5>
+                    <p class="card-text text-muted small">${contenido.descripcion || 'Sin descripción'}</p>
+                    <div class="d-flex justify-content-between">
+                        <small class="text-muted">${new Date(contenido.fechaPublicacion).toLocaleDateString()}</small>
+                        <a href="${contenido.url}" class="btn btn-sm btn-outline-primary" target="_blank">
+                            <i class="bi bi-download"></i> Descargar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+  }
+
+  // Función para mostrar solicitudes
+  function mostrarSolicitudes(solicitudes) {
+    const container = document.getElementById('solicitudesContainer');
+
+    if (solicitudes.length === 0) {
+      container.innerHTML = `
+            <div class="text-center py-4">
+                <i class="bi bi-check-circle fs-1 text-muted"></i>
+                <h5 class="mt-3">No hay solicitudes pendientes</h5>
+            </div>
+        `;
+      return;
+    }
+
+    container.innerHTML = solicitudes.map(solicitud => `
+        <div class="card solicitud-card mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <h5 class="card-title">${solicitud.interes || 'Solicitud de ayuda'}</h5>
+                    <span class="badge bg-danger">${new Date(solicitud.fechaNecesidad).toLocaleDateString()}</span>
+                </div>
+                <p class="card-text">${solicitud.peticion}</p>
+                <small class="text-muted">Publicado por: ${solicitud.emisorNombre || 'Anónimo'}</small>
+            </div>
+        </div>
+    `).join('');
+  }
+
+  // Función para determinar el icono según el tipo de archivo
+  function getFileIconClass(mimeType, fileName) {
+    const extension = fileName.split('.').pop().toLowerCase();
+    const type = mimeType.split('/')[0];
+
+    if (type === 'image') return 'fas fa-file-image text-info';
+    if (type === 'video') return 'fas fa-file-video text-danger';
+    if (type === 'audio') return 'fas fa-file-audio text-warning';
+    if (mimeType === 'application/pdf') return 'fas fa-file-pdf text-danger';
+    if (mimeType.includes('msword') || mimeType.includes('wordprocessingml') || ['doc', 'docx'].includes(extension))
+      return 'fas fa-file-word text-primary';
+    if (mimeType.includes('spreadsheetml') || mimeType.includes('excel') || ['xls', 'xlsx'].includes(extension))
+      return 'fas fa-file-excel text-success';
+    if (mimeType.includes('presentationml') || mimeType.includes('powerpoint') || ['ppt', 'pptx'].includes(extension))
+      return 'fas fa-file-powerpoint text-warning';
+    if (mimeType.includes('zip') || ['zip', 'rar', '7z', 'tar', 'gz'].includes(extension))
+      return 'fas fa-file-archive text-secondary';
+    if (mimeType.includes('text') || ['txt', 'csv', 'json', 'xml', 'html', 'css', 'js'].includes(extension))
+      return 'fas fa-file-code text-success';
+
+    return 'fas fa-file text-secondary';
+  }
+
+  // Manejar envío de formulario para subir contenido
+  document.getElementById('formSubirContenido').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append('archivo', document.getElementById('archivo').files[0]);
+    formData.append('descripcion', document.getElementById('descripcion').value);
+    formData.append('tipoContenido', document.getElementById('tipoContenido').value);
+
+    try {
+      const response = await fetch(`/api/grupos-estudio/${grupoId}/contenidos`, {
+        method: 'POST',
+        headers: {
+          'Authorization': getToken()
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Error al subir contenido');
+      }
+
+      const result = await response.json();
+      showMessage('contenidosContainer', 'Contenido subido exitosamente');
+      cargarDetallesGrupo();
+      this.reset();
+    } catch (error) {
+      showMessage('contenidosContainer', error.message, true);
+    }
+  });
+
+  // Manejar envío de formulario para solicitud de ayuda
+  document.getElementById('formSolicitudAyuda').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const solicitud = {
+      peticion: document.getElementById('peticion').value,
+      fechaNecesidad: document.getElementById('fechaNecesidad').value,
+      interes: document.getElementById('interesGrupo').textContent
+    };
+
+    try {
+      const response = await fetch(`/api/grupos-estudio/${grupoId}/solicitudes`, {
+        method: 'POST',
+        headers: {
+          'Authorization': getToken(),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(solicitud)
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Error al enviar solicitud');
+      }
+
+      const result = await response.json();
+      showMessage('solicitudesContainer', 'Solicitud enviada exitosamente');
+      cargarDetallesGrupo();
+      this.reset();
+    } catch (error) {
+      showMessage('solicitudesContainer', error.message, true);
+    }
+  });
+
+  // Configurar botón de cerrar sesión
+  document.getElementById('cerrarSesion').addEventListener('click', () => {
+    localStorage.removeItem('token');
+    window.location.href = 'index.html';
+  });
+
+  // Cargar detalles al iniciar la página
+  document.addEventListener('DOMContentLoaded', () => {
+    // Verificar autenticación
+    const token = getToken();
+    if (!token) {
+      window.location.href = 'index.html';
+      return;
+    }
+
+    // Cargar detalles del grupo
+    cargarDetallesGrupo();
+  });
+</script>
+</body>
+</html>

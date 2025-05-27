@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+        }
+
+        #sidebar {
+            width: 200px;
+            background-color: #f0f0f0;
+            border-right: 1px solid #ccc;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        #sidebar h3 {
+            margin-top: 0;
+        }
+
+        .amigo {
+            padding: 8px;
+            margin-bottom: 5px;
+            background-color: #e2e2e2;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .amigo:hover {
+            background-color: #ccc;
+        }
+
+        #chat-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background: #f9f9f9;
+        }
+
+        #chat-box {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            background: white;
+            border: 1px solid #ddd;
+        }
+
+        .message {
+            margin: 5px 0;
+            padding: 5px 10px;
+            border-radius: 10px;
+            max-width: 70%;
+            clear: both;
+        }
+
+        .sent {
+            background: #d1e7dd;
+            float: right;
+        }
+
+        .received {
+            background: #f8d7da;
+            float: left;
+        }
+
+        #formulario {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        #formulario input, #formulario button {
+            padding: 10px;
+            font-size: 1em;
+        }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+
+<div id="sidebar">
+    <h3>Amigos</h3>
+    <div id="amigos-list"></div>
+</div>
+
+<div id="chat-container">
+    <h2 id="titulo-chat">Selecciona un amigo</h2>
+    <div id="chat-box"></div>
+
+    <div id="formulario">
+        <input type="text" id="message" placeholder="Mensaje">
+        <button onclick="sendMessage()">Enviar</button>
+    </div>
+</div>
+
+<script>
+    // Variables globales
+    const token = localStorage.getItem('token');
+    let currentUserId = null;
+    let receptorId = null;
+    let amigoSeleccionadoNombre = null;
+    let reconectando = false;
+    let stompClient = null;
+
+    const amigosList = document.getElementById('amigos-list');
+    const chatBox = document.getElementById('chat-box');
+    const tituloChat = document.getElementById('titulo-chat');
+    const messageInput = document.getElementById('message');
+
+    // Iniciar conexión WebSocket al cargar la página
+    document.addEventListener('DOMContentLoaded', function() {
+        conectarWebSocket();
+    });
+
+    // Función para conectar WebSocket
+    function conectarWebSocket() {
+        const socket = new SockJS('/chat-websocket');
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect(
+            { 'Authorization': token },
+            function(frame) {
+                console.log('Conectado:', frame);
+                reconectando = false;
+
+                // Obtener información del usuario actual
+                obtenerUsuarioActual();
+            },
+            function(error) {
+                console.error('Error de conexión:', error);
+                if(!reconectando) {
+                    reconectando = true;
+                    setTimeout(conectarWebSocket, 5000);
+                }
+            }
+        );
+    }
+
+    // Obtener información del usuario actual
+    function obtenerUsuarioActual() {
+        fetch('/api/usuario/me', {
+            headers: { 'Authorization': token }
+        })
+            .then(res => {
+                if(!res.ok) throw new Error('Error al obtener usuario');
+                return res.json();
+            })
+            .then(data => {
+                currentUserId = data.id;
+                suscribirAChat();
+                cargarAmigos();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al cargar información del usuario');
+            });
+    }
+
+    // Suscribirse a los mensajes entrantes
+    function suscribirAChat() {
+        stompClient.subscribe('/tema/chat/' + currentUserId, function(message) {
+            const msg = JSON.parse(message.body);
+            if(!msg.emisorNombre) {
+                msg.emisorNombre = msg.emisorId === currentUserId ? "Tú" : amigoSeleccionadoNombre || "Amigo";
+            }
+            mostrarMensaje(msg, msg.emisorId === currentUserId);
+        });
+    }
+
+    // Cargar lista de amigos
+    function cargarAmigos() {
+        fetch('/api/usuario/amigos', {
+            headers: { 'Authorization': token }
+        })
+            .then(res => {
+                if(!res.ok) throw new Error('Error al cargar amigos');
+                return res.json();
+            })
+            .then(amigos => {
+                amigosList.innerHTML = '';
+                amigos.forEach(amigo => {
+                    const div = document.createElement('div');
+                    div.classList.add('amigo');
+                    div.textContent = amigo.nombre;
+                    div.onclick = () => abrirChatCon(amigo.id, amigo.nombre);
+                    amigosList.appendChild(div);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al cargar lista de amigos');
+            });
+    }
+
+    // Abrir chat con un amigo
+    function abrirChatCon(id, nombre) {
+        receptorId = id;
+        amigoSeleccionadoNombre = nombre;
+        tituloChat.textContent = `Chat con ${nombre}`;
+        chatBox.innerHTML = '';
+
+        fetch(`/chat/${id}`, {
+            headers: { 'Authorization': token }
+        })
+            .then(res => {
+                if(!res.ok) throw new Error('Error al cargar mensajes');
+                return res.json();
+            })
+            .then(mensajes => {
+                mensajes.forEach(msg => {
+                    msg.emisorNombre = msg.emisorId === currentUserId ? "Tú" : nombre;
+                    mostrarMensaje(msg, msg.emisorId === currentUserId);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al cargar historial de chat');
+            });
+    }
+
+    // Mostrar mensaje en el chat
+    function mostrarMensaje(msg, enviado) {
+        const wrapper = document.createElement('div');
+        wrapper.style.clear = "both";
+
+        const nombre = document.createElement('div');
+        nombre.style.fontSize = '0.8em';
+        nombre.style.fontWeight = 'bold';
+        nombre.style.marginBottom = '2px';
+        nombre.textContent = enviado ? "Tú" : msg.emisorNombre || "Desconocido";
+        nombre.style.textAlign = enviado ? 'right' : 'left';
+
+        const div = document.createElement('div');
+        div.classList.add('message', enviado ? 'sent' : 'received');
+        div.textContent = msg.contenido;
+
+        wrapper.appendChild(nombre);
+        wrapper.appendChild(div);
+        chatBox.appendChild(wrapper);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // Enviar mensaje
+    function sendMessage() {
+        if (!stompClient || !stompClient.connected) {
+            alert('No estás conectado. Intentando reconectar...');
+            conectarWebSocket();
+            return;
+        }
+
+        const contenido = messageInput.value.trim();
+        if (!receptorId || !contenido) {
+            alert('Selecciona un amigo y escribe un mensaje');
+            return;
+        }
+
+        const mensaje = {
+            receptorId: receptorId,
+            contenido: contenido,
+            emisorId: currentUserId,
+            emisorNombre: "Tú"
+        };
+
+        try {
+            stompClient.send("/app/enviar", {}, JSON.stringify(mensaje));
+            mostrarMensaje(mensaje, true);
+            messageInput.value = '';
+        } catch (error) {
+            console.error('Error al enviar mensaje:', error);
+            alert('Error al enviar mensaje. Intenta nuevamente.');
+        }
+    }
+
+    // Permitir enviar mensaje con Enter
+    messageInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+</script>
+
+</body>
+</html>
