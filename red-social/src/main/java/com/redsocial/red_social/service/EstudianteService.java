@@ -99,6 +99,9 @@ public class EstudianteService  {
     public List<Estudiante> obtenerEstudiantesConParticipacion() {
         return estudianteRepository.findByContenidosPublicadosIsNotEmpty();
     }
+    public List<Estudiante> obtenerTodos() {
+        return estudianteRepository.findAll();
+    }
 
     // Método para verificar si dos estudiantes son amigos
     public boolean sonAmigos(Long idEstudiante1, Long idEstudiante2) {

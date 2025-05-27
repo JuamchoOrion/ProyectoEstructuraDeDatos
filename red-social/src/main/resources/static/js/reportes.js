@@ -76,8 +76,8 @@ async function cargarDatos() {
         await Promise.all([
             cargarContenidosValorados(),
             cargarParticipacion(),
-            cargarEstudiantesConexiones(),
             cargarCaminosCortos(),
+            cargarEstudiantesConexiones(),
             cargarComunidades(),
         ]);
         console.log("Todos los datos cargados correctamente");
@@ -126,6 +126,39 @@ async function cargarContenidosValorados() {
         throw error;
     }
 }
+async function cargarCaminosCortos() {
+    try {
+        const response = await $.ajax({
+            url: '/api/grafo/caminoCorto',
+            method: 'GET',
+            dataType: 'json'
+        });
+
+        const tabla = $('#tablaCaminos').DataTable();
+        tabla.clear();
+
+        const paresUnicos = new Set();
+
+        response.forEach(item => {
+            const parOrdenado = [item.estudianteA, item.estudianteB].sort().join("-");
+            if (!paresUnicos.has(parOrdenado)) {
+                paresUnicos.add(parOrdenado);
+                tabla.row.add([
+                    item.estudianteA,
+                    item.estudianteB,
+                    item.camino.join(" → "),
+                    item.longitud
+                ]);
+            }
+        });
+
+        tabla.draw();
+    } catch (error) {
+        console.error("Error al cargar caminos cortos:", error);
+        mostrarErrorEnTabla("#tablaCaminos", "Error al cargar caminos más cortos");
+    }
+}
+
 async function cargarParticipacion() {
     try {
         console.log("Cargando datos de participación...");

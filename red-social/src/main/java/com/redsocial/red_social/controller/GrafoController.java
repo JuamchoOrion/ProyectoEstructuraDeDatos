@@ -1,4 +1,5 @@
 package com.redsocial.red_social.controller;
+import com.redsocial.red_social.dto.CaminoDTO;
 import com.redsocial.red_social.dto.EstudianteDTO;
 import com.redsocial.red_social.dto.GrafoDTO;
 import com.redsocial.red_social.model.Estudiante;
@@ -8,6 +9,7 @@ import com.redsocial.red_social.model.Moderador;
 import com.redsocial.red_social.model.estructuras.GrafoEstudiantes;
 import com.redsocial.red_social.repository.EstudianteRepository;
 import com.redsocial.red_social.service.EstudianteService;
+import com.redsocial.red_social.service.ModeradorService;
 import com.redsocial.red_social.util.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -28,14 +30,16 @@ public class GrafoController {
     private final EstudianteService estudianteService;
     private final JwtUtil jwtUtil;
     private final EstudianteRepository estudianteRepository;
+    private final ModeradorService moderadorService;
 
     public GrafoController(GrafoEstudiantes grafoEstudiantes,
                            EstudianteService estudianteService,
-                           JwtUtil jwtUtil, EstudianteRepository estudianteRepository) {
+                           JwtUtil jwtUtil, EstudianteRepository estudianteRepository, ModeradorService moderadorService) {
         this.grafoEstudiantes = grafoEstudiantes;
         this.estudianteService = estudianteService;
         this.jwtUtil = jwtUtil;
         this.estudianteRepository = estudianteRepository;
+        this.moderadorService = moderadorService;
     }
 
     // Endpoint para obtener recomendaciones basadas en el grafo
@@ -56,29 +60,43 @@ public class GrafoController {
     }
 
     // Endpoint para encontrar el camino más corto entre dos estudiantes
-    @GetMapping("/camino/{idDestino}")
-    public ResponseEntity<List<EstudianteDTO>> encontrarCamino(
-            @RequestHeader("Authorization") String token,
-            @PathVariable Long idDestino) {
+    @GetMapping("/caminoCorto")
+    public ResponseEntity<List<CaminoDTO>> obtenerCaminosMasCortos() {
+        List<Estudiante> estudiantes = estudianteService.obtenerTodos();
+        List<CaminoDTO> caminos = new ArrayList<>();
 
-        String username = jwtUtil.extractUsername(token.replace("Bearer ", ""));
-        Estudiante origen = estudianteService.buscarPorUsername(username);
+        Set<String> paresProcesados = new HashSet<>();
 
+        for (Estudiante e1 : estudiantes) {
+            for (Estudiante e2 : estudiantes) {
+                if (!e1.equals(e2)) {
+                    // Evitar procesar el mismo par en orden inverso
+                    String clavePar = e1.getId() + "-" + e2.getId();
+                    String claveParInversa = e2.getId() + "-" + e1.getId();
+                    if (paresProcesados.contains(clavePar) || paresProcesados.contains(claveParInversa)) {
+                        continue;
+                    }
 
-        Estudiante destino = estudianteService.buscarPorId(idDestino);
+                    List<Estudiante> camino = grafoEstudiantes.encontrarCaminoMasCorto(e1.getId(), e2.getId());
 
-        List<Estudiante> camino = grafoEstudiantes.encontrarCaminoMasCorto(origen.getId(), destino.getId());
+                    if (camino != null && camino.size() > 1) {
+                        CaminoDTO dto = new CaminoDTO();
+                        dto.setEstudianteA(e1.getUsername());
+                        dto.setEstudianteB(e2.getUsername());
+                        dto.setCamino(camino.stream().map(Estudiante::getUsername).collect(Collectors.toList()));
+                        dto.setLongitud(camino.size()-1);
+                        caminos.add(dto);
 
-        if (camino.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+                        paresProcesados.add(clavePar);
+                        paresProcesados.add(claveParInversa);
+                    }
+                }
+            }
         }
 
-        List<EstudianteDTO> resultado = camino.stream()
-                .map(this::convertirADTO)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(resultado);
+        return ResponseEntity.ok(caminos);
     }
+
 
     // Endpoint para detectar comunidades (clústeres)
     @GetMapping("/comunidades")
