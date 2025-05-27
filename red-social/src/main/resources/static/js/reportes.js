@@ -189,6 +189,41 @@ async function cargarEstudiantesConexiones() {
         mostrarErrorEnTabla("#tablaConexiones", "Error al cargar estudiantes con más conexiones");
     }
 }
+async function cargarComunidades() {
+    try {
+        console.log("Cargando comunidades de estudio...");
+        const response = await $.ajax({
+            url: '/api/grafo/comunidades',
+            method: 'GET',
+            dataType: 'json'
+        });
+
+        console.log("Comunidades recibidas:", response);
+
+        const tabla = $('#tablaComunidades').DataTable();
+        tabla.clear();
+
+        if (response && response.length > 0) {
+            response.forEach((grupo, index) => {
+                const nombreGrupo = `Clúster ${index + 1}`;
+                const miembros = grupo.map(est => est.username || 'N/A').join('<br>');
+
+                tabla.row.add([
+                    nombreGrupo,
+                    miembros
+                ]);
+            });
+        } else {
+            tabla.row.add(['No hay comunidades detectadas', '']).draw();
+        }
+
+        tabla.draw();
+    } catch (error) {
+        console.error("Error al cargar comunidades:", error);
+        mostrarErrorEnTabla("#tablaComunidades", "Error al cargar comunidades");
+    }
+}
+
 
 
 async function cargarParticipacion() {
