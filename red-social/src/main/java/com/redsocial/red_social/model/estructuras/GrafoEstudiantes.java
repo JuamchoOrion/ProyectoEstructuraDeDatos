@@ -138,6 +138,19 @@ public class GrafoEstudiantes {
         return comunidades;
     }
 
+    public Set<Estudiante> obtenerVecinosEstudiante(Long idEstudiante) {
+        NodoEstudiante nodo = nodos.get(idEstudiante);
+        if (nodo != null) {
+            return nodo.getVecinos().stream()
+                    .map(NodoEstudiante::getEstudiante)
+                    .collect(Collectors.toSet());
+        }
+        return Collections.emptySet();
+    }
+
+
+
+
     // Método para visualizar el grafo
     public GrafoDTO visualizar() {
         List<NodoDTO> nodosDTO = nodos.values().stream()

@@ -158,6 +158,38 @@ async function cargarCaminosCortos() {
         mostrarErrorEnTabla("#tablaCaminos", "Error al cargar caminos más cortos");
     }
 }
+async function cargarEstudiantesConexiones() {
+    try {
+        console.log("Cargando estudiantes con más conexiones...");
+        const response = await $.ajax({
+            url: '/api/grafo/conexiones',
+            method: 'GET',
+            dataType: 'json'
+        });
+
+        const tabla = $('#tablaConexiones').DataTable();
+        tabla.clear();
+
+        if (response && response.length > 0) {
+            response.forEach(estudiante => {
+                tabla.row.add([
+                    estudiante.id || 'N/A',
+                    estudiante.username || 'N/A',
+                    estudiante.email || 'N/A',
+                    estudiante.conexiones || 0
+                ]);
+            });
+        } else {
+            tabla.row.add(['No hay datos disponibles', '', '', '']).draw();
+        }
+
+        tabla.draw();
+    } catch (error) {
+        console.error("Error al cargar estudiantes con conexiones:", error);
+        mostrarErrorEnTabla("#tablaConexiones", "Error al cargar estudiantes con más conexiones");
+    }
+}
+
 
 async function cargarParticipacion() {
     try {

@@ -113,6 +113,7 @@ public class SecurityConfig {
                                 "/api/grafo/comunidades",
                                 "/api/grafo/recomendaciones",
                                 "/api/grafo/caminoCorto",
+                                "/api/grafo/conexiones",
                                 "/api/grupos-estudio/**",
                                 "/api/contenido/mios",
                                 "/api/usuario/listar",

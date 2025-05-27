@@ -1,5 +1,6 @@
 package com.redsocial.red_social.controller;
 import com.redsocial.red_social.dto.CaminoDTO;
+import com.redsocial.red_social.dto.EstudianteConConexionDTO;
 import com.redsocial.red_social.dto.EstudianteDTO;
 import com.redsocial.red_social.dto.GrafoDTO;
 import com.redsocial.red_social.model.Estudiante;
@@ -96,6 +97,24 @@ public class GrafoController {
 
         return ResponseEntity.ok(caminos);
     }
+
+    @GetMapping("/conexiones")
+    public ResponseEntity<List<EstudianteConConexionDTO>> obtenerConexionesEstudiantes() {
+        List<Estudiante> estudiantes = estudianteService.obtenerTodos();
+        List<EstudianteConConexionDTO> resultado = new ArrayList<>();
+
+        for (Estudiante estudiante : estudiantes) {
+            int conexiones = grafoEstudiantes.obtenerVecinosEstudiante(estudiante.getId()).size();
+            EstudianteConConexionDTO dto = new EstudianteConConexionDTO();
+            dto.setId(estudiante.getId());
+            dto.setUsername(estudiante.getUsername());
+            dto.setEmail(estudiante.getEmail());
+            dto.setConexiones(conexiones);
+            resultado.add(dto);
+        }
+        return ResponseEntity.ok(resultado);
+    }
+
 
 
     // Endpoint para detectar comunidades (clústeres)
