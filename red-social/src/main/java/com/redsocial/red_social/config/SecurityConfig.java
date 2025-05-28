@@ -131,6 +131,8 @@ public class SecurityConfig {
                                 "/api/usuario/cargarDatos/*"
 
                         ).permitAll()
+                        .requestMatchers(HttpMethod.PUT,
+                                "/api/usuario/editar/*").permitAll()
 
                         // Endpoints públicos de API (DELETE)
                         .requestMatchers(HttpMethod.DELETE,

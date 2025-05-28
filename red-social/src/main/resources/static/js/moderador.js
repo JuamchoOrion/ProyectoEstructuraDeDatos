@@ -167,16 +167,6 @@ $(document).ready(function() {
         }
     });
 
-    function mostrarAlerta(mensaje, tipo) {
-        const alerta = $(`
-        <div class="alert alert-${tipo} alert-dismissible fade show" role="alert">
-            ${mensaje}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    `);
-        $('#alert-container').append(alerta);
-        setTimeout(() => alerta.alert('close'), 5000);
-    }
 
     // Función para mostrar alertas
     function mostrarAlerta(mensaje, tipo) {
@@ -189,4 +179,58 @@ $(document).ready(function() {
         $('body').append(alerta);
         setTimeout(() => alerta.alert('close'), 5000);
     }
+    function showLoading(elementId) {
+        const element = document.getElementById(elementId);
+        element.innerHTML = '<p class="loading">Procesando...</p>';
+    }
+
+    function showMessage(message, type = "info") {
+        const div = document.createElement("div");
+        div.innerText = message;
+        div.className = `message ${type}`;
+        document.body.appendChild(div);
+
+        setTimeout(() => div.remove(), 3000);
+    }
+
+    async function generarGruposMod() {
+        const resultElement = document.getElementById('resultGenerar');
+        showLoading('resultGenerar');
+
+        try {
+            const response = await fetch(`/api/grupos-estudio/generar`, { method: 'POST' });
+            if (!response.ok) throw new Error(await response.text() || 'Error al generar grupos');
+
+            resultElement.innerHTML = ''; // Quitar mensaje de carga
+            showMessage('¡Grupos generados exitosamente!', 'success');
+        } catch (error) {
+            resultElement.innerHTML = ''; // Quitar mensaje de carga en caso de error
+            showMessage(error.message, 'error');
+        }
+    }
+
+    document.getElementById('cerrarSesion')?.addEventListener('click', () => {
+        localStorage.removeItem('token');
+        window.location.href = 'index.html';
+    });
+
+// Esto es correcto para exponer la función al HTML
+    window.generarGruposMod = generarGruposMod;
+
+
+    function getFileIconClass(mimeType, fileName) {
+        const extension = fileName.split('.').pop().toLowerCase();
+        const type = mimeType.split('/')[0];
+        if (type === 'image') return 'fas fa-file-image';
+        if (type === 'video') return 'fas fa-file-video';
+        if (type === 'audio') return 'fas fa-file-audio';
+        if (mimeType === 'application/pdf') return 'fas fa-file-pdf';
+        if (mimeType.includes('msword') || mimeType.includes('wordprocessingml') || ['doc', 'docx'].includes(extension)) return 'fas fa-file-word';
+        if (mimeType.includes('spreadsheetml') || mimeType.includes('excel') || ['xls', 'xlsx'].includes(extension)) return 'fas fa-file-excel';
+        if (mimeType.includes('presentationml') || mimeType.includes('powerpoint') || ['ppt', 'pptx'].includes(extension)) return 'fas fa-file-powerpoint';
+        if (mimeType.includes('zip') || ['zip', 'rar', '7z', 'tar', 'gz'].includes(extension)) return 'fas fa-file-archive';
+        if (mimeType.includes('text') || ['txt', 'csv', 'json', 'xml', 'html', 'css', 'js'].includes(extension)) return 'fas fa-file-code';
+        return 'fas fa-file';
+    }
 });
+
