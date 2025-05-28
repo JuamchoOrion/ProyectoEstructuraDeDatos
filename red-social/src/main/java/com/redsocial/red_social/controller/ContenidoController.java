@@ -3,6 +3,7 @@ package com.redsocial.red_social.controller;
 import com.redsocial.red_social.dto.ContenidoDTO;
 import com.redsocial.red_social.dto.ContenidoRequest;
 import com.redsocial.red_social.dto.ContenidoResponse;
+import com.redsocial.red_social.dto.EstudianteDTO;
 import com.redsocial.red_social.model.*;
 import com.redsocial.red_social.repository.ContenidoRepository;
 import com.redsocial.red_social.repository.EstudianteRepository;
@@ -181,5 +182,44 @@ private ContenidoDTO convertirADTO(Contenido contenido) {
                 .promedioValoracion(promedio)
                 .build();
     }
+    @GetMapping("/listar")
+    public ResponseEntity<List<ContenidoDTO>> obtenerContenidos() {
+        List<Contenido> contenidos = contenidoService.obtenerTodos();
+        List<ContenidoDTO> resultado = contenidos.stream()
+                .map(contenido -> {
+                    ContenidoDTO dto = convertirADTO(contenido);
+                    // Asegura que la URL tenga el formato correcto
+                    dto.setNombreAlmacenado(contenido.getNombreAlmacenado());
+                    dto.setUrl("/uploads/" + contenido.getNombreAlmacenado());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(resultado);
+    }
+    @GetMapping("/contenidosContados")
+    public ResponseEntity<List<EstudianteDTO>> obtenerParticipacion() {
+        List<Estudiante> estudiantes = estudianteService.obtenerEstudiantesConParticipacion();
 
+        List<EstudianteDTO> resultado = estudiantes.stream()
+                .map(estudiante -> {
+                    EstudianteDTO dto = convertirADTOest(estudiante);
+                    dto.setPublicaciones(contenidoService.contarPublicacionesPorEstudiante(estudiante.getId()));
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(resultado);
+    }
+    public EstudianteDTO convertirADTOest(Estudiante estudiante) {
+        // Calcular el número de publicaciones del estudiante
+        Long contadorPublicaciones = contenidoService.contarPublicacionesPorEstudiante(estudiante.getId());
+
+        return EstudianteDTO.builder()
+                .id(estudiante.getId())
+                .username(estudiante.getUsername())
+                .email(estudiante.getEmail())
+                .intereses(estudiante.getIntereses()) // Asume que Estudiante tiene getIntereses()
+                .publicaciones(contadorPublicaciones)
+               .build();
+    }
 }

@@ -113,8 +113,13 @@ public class SecurityConfig {
                                 "/api/grafo/recomendaciones",
                                 "/api/usuario/listarFiltrados",
                                 "/api/grupos-estudio/**",
+                                "/api/grafo/caminoCorto",
+                                "/api/grafo/conexiones",
+                                "/api/grafo/**",
                                 "/api/contenido/mios",
                                 "/api/usuario/listar",
+                                "/api/contenido/listar",
+                                "/api/contenido/contenidosContados",
                                 "/api/grupos-estudio/estudiante/**"
                         ).permitAll()
 
