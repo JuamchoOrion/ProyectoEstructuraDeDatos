@@ -101,6 +101,8 @@ public class SecurityConfig {
                                 "/api/grupos-estudio/generar",
                                 "/api/usuario/agregar"
                         ).permitAll()
+                        .requestMatchers(HttpMethod.PUT,
+                                "/api/usuario/editar/*").permitAll()
                         .requestMatchers("/chat-websocket/**").permitAll()  // handshake SockJS
                         .requestMatchers("/tema/**").permitAll()            // destino de mensajes STOMP
                         // Endpoints públicos de API (GET)

@@ -2,7 +2,6 @@ package com.redsocial.red_social.controller;
 
 import com.redsocial.red_social.dto.MensajeChatDTO;
 import com.redsocial.red_social.model.Estudiante;
-import com.redsocial.red_social.model.Mensaje;
 import com.redsocial.red_social.model.MensajeChat;
 import com.redsocial.red_social.repository.EstudianteRepository;
 import com.redsocial.red_social.repository.MensajeChatRepository;

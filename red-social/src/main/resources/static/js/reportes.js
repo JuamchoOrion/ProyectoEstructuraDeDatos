@@ -108,7 +108,7 @@ async function cargarContenidosValorados() {
             response.forEach(item => {
                 table.row.add([
                     item.id || 'N/A',
-                    item.nombre || item.titulo || item.nombreAlmacenado || 'Sin título',
+                    item.nombre || item.titulo || item.nombreOriginal || 'Sin título',
                     item.autor || 'Desconocido',
                     item.promedioValoracion !== undefined ? item.promedioValoracion.toFixed(2) : '0.00',
                     item.likes || item.numeroVotos || 0

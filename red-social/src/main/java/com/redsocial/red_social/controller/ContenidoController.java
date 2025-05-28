@@ -189,7 +189,7 @@ private ContenidoDTO convertirADTO(Contenido contenido) {
                 .map(contenido -> {
                     ContenidoDTO dto = convertirADTO(contenido);
                     // Asegura que la URL tenga el formato correcto
-                    dto.setNombreAlmacenado(contenido.getNombreAlmacenado());
+                    dto.setNombreOriginal(contenido. getNombreOriginal());
                     dto.setUrl("/uploads/" + contenido.getNombreAlmacenado());
                     return dto;
                 })
