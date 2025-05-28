@@ -21,6 +21,7 @@ public class EstudianteDTO {
     private String email;
     private Set<Intereses> intereses;
     private Long publicaciones;
+    private String password;
 
     // Constructor con 3 parámetros (opcional)
     public EstudianteDTO(Long id, String username, String email) {

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Editar Estudiante - Aprende+</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <!-- Agregar Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body class="bg-light">
+<div class="container py-5"> <!-- Cambiamos vh-100 por py-5 para padding vertical -->
+    <div class="card shadow p-4 mx-auto" style="max-width: 450px;"> <!-- Quitamos width: 100% -->
+        <h2 class="text-center mb-4"><i class="fas fa-user-edit me-2"></i>Editar Estudiante</h2>
+        <form id="editarForm">
+            <!-- Información actual -->
+            <div class="mb-3">
+                <label class="form-label">Username actual</label>
+                <div class="form-control bg-light" id="usernameActual">Juan Pérez</div>
+                <small class="form-text text-muted">Username actual</small>
+            </div>
+
+            <div class="mb-3">
+                <label for="nuevoUsername" class="form-label">Nuevo username</label>
+                <input type="text" class="form-control" id="nuevoUsername" placeholder="Nuevo username del estudiante" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Correo actual</label>
+                <div class="form-control bg-light" id="emailActual">juan.perez@ejemplo.com</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="nuevoEmail" class="form-label">Nuevo correo electrónico</label>
+                <input type="email" class="form-control" id="nuevoEmail" placeholder="nuevo@correo.com" />
+            </div>
+
+            <div class="mb-3">
+                <label for="nuevaPassword" class="form-label">Nueva contraseña</label>
+                <input type="password" class="form-control" id="nuevaPassword" placeholder="Dejar en blanco para no cambiar" />
+                <small class="form-text text-muted">Mínimo 6 caracteres</small>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Intereses actuales</label>
+                <div class="form-control bg-light" id="interesesActual">Cargando...</div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Actualizar intereses</label>
+                <div class="d-flex flex-column gap-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="edit-matematicas" value="MATEMATICAS" checked />
+                        <label class="form-check-label" for="edit-matematicas">
+                            <i class="fas fa-square-root-alt me-2"></i>Matemáticas
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="edit-fisica" value="FISICA" checked />
+                        <label class="form-check-label" for="edit-fisica">
+                            <i class="fas fa-atom me-2"></i>Física
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="edit-biologia" value="BIOLOGIA" />
+                        <label class="form-check-label" for="edit-biologia">
+                            <i class="fas fa-dna me-2"></i>Biología
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="edit-sociales" value="SOCIALES" />
+                        <label class="form-check-label" for="edit-sociales">
+                            <i class="fas fa-globe-americas me-2"></i>Sociales
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="edit-etica" value="ETICA" />
+                        <label class="form-check-label" for="edit-etica">
+                            <i class="fas fa-hand-holding-heart me-2"></i>Ética
+                        </label>
+                    </div>
+                </div>
+                <small class="form-text text-muted">Selecciona los nuevos intereses</small>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>Guardar Cambios
+                </button>
+                <a href="#" class="btn btn-outline-secondary">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </a>
+            </div>
+            <div id="editar-alert-container"></div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/editarEstudiante.js"></script>
+</body>
+</html>

@@ -2,9 +2,11 @@ package com.redsocial.red_social.service;
 
 import com.redsocial.red_social.dto.UsuarioDTO;
 import com.redsocial.red_social.model.Estudiante;
+import com.redsocial.red_social.model.Moderador;
 import com.redsocial.red_social.model.Usuario;
 import com.redsocial.red_social.repository.EstudianteRepository;
 import com.redsocial.red_social.repository.UsuarioRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +45,18 @@ public class UsuarioService {
 
     public void eliminarUsuario(Long id) {
         usuarioRepository.deleteById(id);
+    }
+    public String obtenerRolUsuario(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+
+        if (usuario instanceof Moderador) {
+            return "MODERADOR";
+        } else if (usuario instanceof Estudiante) {
+            return "ESTUDIANTE";
+        } else {
+            throw new IllegalStateException("Tipo de usuario no reconocido");
+        }
     }
 
 

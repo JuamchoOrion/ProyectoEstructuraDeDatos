@@ -1,5 +1,6 @@
 package com.redsocial.red_social.controller;
 
+import com.redsocial.red_social.dto.EstudianteDTO;
 import com.redsocial.red_social.dto.InteresRequest;
 import com.redsocial.red_social.dto.UsuarioDTO;
 import com.redsocial.red_social.model.Estudiante;
@@ -118,6 +119,7 @@ public class UsuarioController {
 
         return ResponseEntity.ok("Interés eliminado correctamente");
     }
+
     @DeleteMapping("/{id}/eliminar")
     public ResponseEntity<?> eliminarUsuario(@PathVariable Long id) {
         try {
@@ -129,6 +131,20 @@ public class UsuarioController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al eliminar usuario: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}/verificarRol")
+    public ResponseEntity<?> verificarRolUsuario(@PathVariable Long id) {
+        try {
+            String rol = usuarioService.obtenerRolUsuario(id);
+            return ResponseEntity.ok().body(Map.of("rol", rol));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Usuario no encontrado con ID: " + id);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al verificar rol: " + e.getMessage());
         }
     }
 
@@ -200,6 +216,40 @@ public class UsuarioController {
 
         return ResponseEntity.ok(amigos);
     }
+    @GetMapping("/cargarDatos/{id}")
+    public ResponseEntity<?> cargarDatosEstudiante(@PathVariable Long id) {
+        try {
+            Estudiante estudiante = estudianteService.obtenerPorId(id);
+            EstudianteDTO dto = convertirAEstudianteDTO(estudiante);
+            return ResponseEntity.ok(dto);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    private EstudianteDTO convertirAEstudianteDTO(Estudiante estudiante) {
+        EstudianteDTO dto = new EstudianteDTO();
+        dto.setId(estudiante.getId());
+        dto.setUsername(estudiante.getUsername());
+        dto.setEmail(estudiante.getEmail());
+        dto.setPassword(estudiante.getPassword());
+        dto.setIntereses(estudiante.getIntereses());
+        return dto;
+    }
+
+    @PutMapping("/editar/{id}")
+    public ResponseEntity<?> actualizarEstudiante(
+            @PathVariable Long id,
+            @RequestBody EstudianteDTO estudianteDTO) {
+        try {
+            Estudiante estudianteActualizado = estudianteService.actualizar(id, estudianteDTO);
+            return ResponseEntity.ok(estudianteActualizado);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
 
 
+    }
 }

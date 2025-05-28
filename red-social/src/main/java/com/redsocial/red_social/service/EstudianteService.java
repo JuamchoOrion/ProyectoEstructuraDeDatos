@@ -1,8 +1,10 @@
 package com.redsocial.red_social.service;
 
+import com.redsocial.red_social.dto.EstudianteDTO;
 import com.redsocial.red_social.model.Estudiante;
 import com.redsocial.red_social.model.Usuario;
 import com.redsocial.red_social.repository.EstudianteRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.User;
@@ -102,6 +104,37 @@ public class EstudianteService  {
     public List<Estudiante> obtenerTodos() {
         return estudianteRepository.findAll();
     }
+    public Estudiante obtenerPorId(Long id) {
+        return estudianteRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Estudiante con ID " + id + " no encontrado"));
+    }
+    public Estudiante actualizar(Long id, EstudianteDTO estudianteDTO) {
+        Estudiante estudiante = obtenerPorId(id); // Reutiliza el método existente
+
+        // Actualizar solo campos no nulos
+        if (estudianteDTO.getUsername() != null) {
+            estudiante.setUsername(estudianteDTO.getUsername());
+        }
+
+        if (estudianteDTO.getEmail() != null) {
+            estudiante.setEmail(estudianteDTO.getEmail());
+        }
+
+        if (estudianteDTO.getPassword() != null) {
+            estudiante.setPassword(passwordEncoder.encode(estudianteDTO.getPassword()));
+        }
+
+        // Validación de intereses
+        if (estudianteDTO.getIntereses() != null) {
+            if (estudianteDTO.getIntereses().isEmpty()) {
+                throw new IllegalArgumentException("Debe seleccionar al menos un interés");
+            }
+            estudiante.setIntereses(estudianteDTO.getIntereses());
+        }
+
+        return estudianteRepository.save(estudiante);
+    }
+
 
     // Método para verificar si dos estudiantes son amigos
     public boolean sonAmigos(Long idEstudiante1, Long idEstudiante2) {

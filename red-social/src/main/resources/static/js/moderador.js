@@ -1,4 +1,5 @@
 $(document).ready(function() {
+
     // Verificar autenticación
     const token = localStorage.getItem('token');
     if (!token) {
@@ -14,12 +15,12 @@ $(document).ready(function() {
             error: function(xhr) {
                 console.error('Error cargando datos:', xhr.statusText);
 
-               // if (xhr.status === 401) {
-               //     localStorage.removeItem('token');
-                 //   window.location.href = 'registro.html';
+                // if (xhr.status === 401) {
+                //     localStorage.removeItem('token');
+                //   window.location.href = 'registro.html';
                 //} else if (xhr.status === 403) {
-                  //  alert('No tienes permisos de moderador');
-                    //window.location.href = 'index.html';
+                //  alert('No tienes permisos de moderador');
+                //window.location.href = 'index.html';
                 //}
             }
         },
@@ -81,13 +82,52 @@ $(document).ready(function() {
     // Botón cerrar sesión
     $('#cerrarSesion').click(function() {
         localStorage.removeItem('token');
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
     });
 
-    // Evento para editar usuario (sin token)
+    // Evento para editar usuario con validación del rol del usuario objetivo
     $('#tablaUsuarios tbody').on('click', '.btn-editar', function() {
         const id = $(this).data('id');
-        window.location.href = `editarUsuario.html?id=${id}`;
+        const $btn = $(this);
+        const $row = $btn.closest('tr');
+
+        // Deshabilitar botón y mostrar spinner
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+        $row.addClass('table-warning');
+
+        // Primero verificar el rol del usuario a editar
+        fetch(`http://localhost:8080/api/usuario/${id}/verificarRol`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al verificar el rol del usuario');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.rol === 'MODERADOR') {
+                    throw new Error('No está permitido editar usuarios moderadores');
+                }
+                else if (data.rol === 'ESTUDIANTE') {
+                    window.location.href = `editarEstudiante.html?id=${id}`;
+                }
+                else {
+                    throw new Error('Rol de usuario no reconocido');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                mostrarAlerta(error.message || 'Error al preparar la edición', 'danger');
+            })
+            .finally(() => {
+                // Restaurar botón
+                $btn.prop('disabled', false).html('<i class="fas fa-edit"></i>');
+                $row.removeClass('table-warning');
+            });
     });
 
 // Evento para eliminar usuario (sin token)
