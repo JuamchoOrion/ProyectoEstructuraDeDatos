@@ -85,8 +85,6 @@ public class SecurityConfig {
                                 "editarEstudiante.html",
                                 "editarEstudiante.js"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.PUT,
-                                "/api/usuario/editar/*").permitAll()
 
                         // Endpoints públicos de API (POST)
                         .requestMatchers(HttpMethod.POST,
@@ -117,10 +115,13 @@ public class SecurityConfig {
                                 "/api/solicitudes",
                                 "/api/grafo/visualizar",
                                 "/api/grafo/comunidades",
+                                "/api/grafo/recomendaciones-multinivel",
                                 "/api/grafo/recomendaciones",
+                                "/api/usuario/listarFiltrados",
+                                "/api/grupos-estudio/**",
                                 "/api/grafo/caminoCorto",
                                 "/api/grafo/conexiones",
-                                "/api/grupos-estudio/**",
+                                "/api/grafo/**",
                                 "/api/contenido/mios",
                                 "/api/usuario/listar",
                                 "/api/contenido/listar",

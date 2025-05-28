@@ -21,6 +21,7 @@ public class UsuarioService {
     private UsuarioRepository usuarioRepository;
     @Autowired
     private EstudianteRepository estudianteRepository;
+
     public List<UsuarioDTO> obtenerTodos() {
         List<Usuario> usuarios = usuarioRepository.findAll();
 
@@ -34,6 +35,21 @@ public class UsuarioService {
                 ))
                 .collect(Collectors.toList());
     }
+    public List<UsuarioDTO> obtenerTodosFiltrado(String username) {
+        List<Usuario> usuarios = usuarioRepository.findAll();
+        usuarios.removeIf(usuario -> usuario.getUsername().equals(username));
+        // Convertir lista de entidades a lista de DTOs
+        return usuarios.stream()
+                .map(usuario -> new UsuarioDTO(
+                        usuario.getId(),
+                        usuario.getUsername(),
+                        usuario.getEmail(),
+                        usuario.getClass().getSimpleName()// tipoUsuario: Estudiante o Moderador
+                ))
+                .collect(Collectors.toList());
+    }
+
+
 
     public Optional<Usuario> obtenerPorId(Long id) {
         return usuarioRepository.findById(id);

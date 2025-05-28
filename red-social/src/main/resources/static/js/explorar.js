@@ -9,6 +9,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let contenidos = [];
     let filtroTipo = 'ALL';
+    let filtroAutor = '';
+    let filtroTipoArchivo = 'ALL';
+    let filtroInteres ='ALL';
+
     const barraBusqueda = document.getElementById('barraBusqueda');
     const formBusqueda = document.getElementById('formBusqueda');
     const contenedor = document.getElementById('contenedorExplorar');
@@ -16,6 +20,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('cerrarSesion')?.addEventListener('click', () => {
         localStorage.removeItem('token');
         window.location.href = 'index.html';
+    });
+    // Event listeners para los nuevos filtros
+    document.getElementById('filtroAutor')?.addEventListener('input', (e) => {
+        filtroAutor = e.target.value.trim().toLowerCase();
+        aplicarFiltros();
+    });
+    document.getElementById('filtroInteres')?.addEventListener('change', (e) => {
+        filtroInteres = e.target.value;
+        aplicarFiltros();
+    });
+
+    document.getElementById('filtroTipoArchivo')?.addEventListener('change', (e) => {
+        filtroTipoArchivo = e.target.value;
+        aplicarFiltros();
     });
 
     fetchContenidos();
@@ -29,21 +47,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         buscarContenidos();
     });
 
+// Función buscarContenidos actualizada
     function buscarContenidos() {
         const query = barraBusqueda?.value.trim().toLowerCase() || '';
 
         const resultados = contenidos.filter(c => {
-            // Filtro por tipo
-            const tipoCoincide = filtroTipo === 'ALL' ||
+            // Filtro por tipo de contenido (nuevo)
+            const tipoContenidoCoincide = filtroTipo === 'ALL' ||
                 (c.tipoContenido && c.tipoContenido.toUpperCase() === filtroTipo.toUpperCase());
+            const interesCoincide = filtroInteres === 'ALL' ||
+                (c.interes && c.interes.toUpperCase() === filtroInteres.toUpperCase()) ||
+                (filtroInteres === 'OTROS' && (!c.interes || c.interes === ''));
 
-            // Filtro por búsqueda
+            // Filtro por tipo de archivo (nuevo)
+            const tipoArchivoCoincide = filtroTipoArchivo === 'ALL' ||
+                (filtroTipoArchivo === 'image' && c.tipoArchivo?.startsWith('image')) ||
+                (filtroTipoArchivo === 'video' && c.tipoArchivo?.startsWith('video')) ||
+                (c.tipoArchivo === filtroTipoArchivo);
+
+            // Filtro por autor (nuevo)
+            const autorCoincide = !filtroAutor ||
+                (c.autor && c.autor.toLowerCase().includes(filtroAutor));
+
+            // Filtro por búsqueda general
             const textoCoincide = !query ||
                 (c.nombreOriginal?.toLowerCase().includes(query)) ||
-                (c.descripcion?.toLowerCase().includes(query)) ||
-                (c.autor?.toLowerCase().includes(query));
+                (c.descripcion?.toLowerCase().includes(query));
 
-            return tipoCoincide && textoCoincide;
+            return tipoContenidoCoincide && tipoArchivoCoincide && autorCoincide &&
+                interesCoincide && textoCoincide;
         });
 
         renderContenidos(resultados);
@@ -137,27 +169,48 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
 
                 const card = document.createElement('div');
+
+
                 card.className = 'col-md-4 mb-4';
                 card.innerHTML = `
-                  <div class="card shadow-sm h-100">
-                    ${mediaContent}
-                    <div class="card-body">
-                      <h5 class="card-title">${c.nombreOriginal || 'Sin título'}</h5>
-                      <p class="card-text">${c.descripcion || 'Sin descripción'}</p>
-                      <div class="d-flex justify-content-between">
-                        <p class="mb-1"><strong>Tipo:</strong> ${c.tipoArchivo || 'Desconocido'}</p>
-                        <p class="mb-1"><strong>Autor:</strong> ${c.autor || 'Anónimo'}</p>
+              <div class="card shadow-sm h-100">
+                ${mediaContent}
+                <div class="card-body">
+                  <h5 class="card-title">${c.nombreOriginal || 'Sin título'}</h5>
+                  <div class="contenedor-mensajes">
+                    <p class="card-text">${c.descripcion || 'Sin descripción'}</p>
+                  </div>
+                  <div class="info-adicional">
+                    <div class="d-flex justify-content-between small">
+                      <span><strong>Tipo:</strong> ${c.tipoArchivo || 'Desconocido'}</span>
+                      <span><strong>Autor:</strong> ${c.autor || 'Anónimo'}</span>
+                    </div>
+                    <div class="d-flex justify-content-between small mt-1">
+                      <span><strong>Categoría:</strong> ${c.tipoContenido || 'No especificado'}</span>
+                      ${c.interes ? `<span><strong>Interés:</strong> ${c.interes ||'No especificado'}</span>` : ''}
+                    </div>
+                    <small class="text-muted d-block mt-2">Publicado: ${c.fechaPublicacion ? new Date(c.fechaPublicacion).toLocaleDateString() : 'fecha desconocida'}</small>
+                    <div class="mt-2">
+                      <div class="valoracion" data-id="${c.id}">
+                        ${renderStars(c.id, c.promedioValoracion || 0)}
                       </div>
-                      <small class="text-muted">Publicado el ${c.fechaPublicacion ? new Date(c.fechaPublicacion).toLocaleDateString() : 'fecha desconocida'}</small>
-                      <div class="mt-3">
-                        <div class="valoracion" data-id="${c.id}">
-                          ${renderStars(c.id, c.promedioValoracion || 0)}
-                        </div>
-                        <small class="text-muted" id="promedio-${c.id}">Valoración: ${calcularPromedio(c)} ⭐</small>
-                      </div>
+                      <small class="text-muted" id="promedio-${c.id}">Valoración: ${calcularPromedio(c)} ⭐</small>
                     </div>
                   </div>
-                `;
+                </div>
+              </div>
+            `;
+                const cardText = card.querySelector('.card-text');
+                if (cardText && cardText.scrollHeight > cardText.clientHeight) {
+                    const toggleBtn = document.createElement('button');
+                    toggleBtn.className = 'btn btn-link btn-sm p-0 text-primary';
+                    toggleBtn.textContent = 'Ver más';
+                    toggleBtn.addEventListener('click', () => {
+                        cardText.classList.toggle('scrollable');
+                        toggleBtn.textContent = cardText.classList.contains('scrollable') ? 'Ver menos' : 'Ver más';
+                    });
+                    cardText.parentNode.insertBefore(toggleBtn, cardText.nextSibling);
+                }
                 contenedor.appendChild(card);
             } catch (error) {
                 console.error('Error al renderizar contenido:', c, error);
@@ -236,91 +289,3 @@ document.addEventListener('DOMContentLoaded', async () => {
         contenedor.innerHTML = `<div class="alert alert-danger">${mensaje}</div>`;
     }
 });
-
-/**
-    contenedor?.addEventListener('click', async (e) => {
-        if (e.target.classList.contains('estrella')) {
-            try {
-                const id = e.target.getAttribute('data-id');
-                const valor = parseInt(e.target.getAttribute('data-valor'));
-
-                if (!id || isNaN(valor) || valor < 1 || valor > 5) {
-                    console.error('Valoración inválida');
-                    return;
-                }
-
-                const response = await fetch(`/api/contenido/${id}/valorar`, {
-                    method: 'POST',
-                    headers: {
-                        "Authorization": token, // Añade 'Bearer ' antes del token
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        contenidoId: id,
-                        valoracion: valor
-                    })
-                });
-
-                if (!response.ok) {
-                    const errorText = await response.text(); // Lee el error como texto
-                    throw new Error(errorText);
-                }
-
-                // Cambia response.json() por response.text() ya que el backend devuelve texto plano
-                const mensaje = await response.text();
-                console.log("Respuesta del servidor:", mensaje);
-
-                // Actualiza la interfaz (opcional)
-                const promedioElement = document.getElementById(`promedio-${id}`);
-                if (promedioElement) {
-                    // Puedes actualizar el promedio manualmente o hacer otra llamada para obtenerlo
-                    promedioElement.textContent = `Valoración: Calculando...`;
-                }
-
-                mostrarFeedback(mensaje, 'success');
-
-                // Opcional: Recarga los contenidos para actualizar las valoraciones
-                setTimeout(fetchContenidos, 1000);
-
-            } catch (error) {
-                console.error('Error en valoración:', error);
-                mostrarFeedback(error.message || 'Error al registrar valoración', 'danger');
-            }
-        }
-    });
-
-    function mostrarFeedback(mensaje, tipo = 'success') {
-        const feedback = document.createElement('div');
-        feedback.className = `alert alert-${tipo} fixed-top mx-auto mt-3`;
-        feedback.style.width = 'fit-content';
-        feedback.style.maxWidth = '90%';
-        feedback.style.zIndex = '1000';
-        feedback.textContent = mensaje;
-        document.body.appendChild(feedback);
-
-        setTimeout(() => {
-            feedback.style.opacity = '0';
-            feedback.style.transition = 'opacity 0.5s';
-            setTimeout(() => feedback.remove(), 500);
-        }, 3000);
-    }
-
-    function mostrarError(mensaje) {
-        const errorContainer = document.getElementById('error-container') || document.createElement('div');
-        errorContainer.id = 'error-container';
-        errorContainer.className = 'alert alert-danger mt-3';
-        errorContainer.style.maxWidth = '600px';
-        errorContainer.style.margin = '0 auto';
-        errorContainer.textContent = mensaje;
-
-        if (!document.getElementById('error-container')) {
-            document.querySelector('main')?.prepend(errorContainer);
-        }
-
-        setTimeout(() => {
-            errorContainer.style.opacity = '0';
-            errorContainer.style.transition = 'opacity 0.5s';
-            setTimeout(() => errorContainer.remove(), 500);
-        }, 3000);
-    }
-});**/

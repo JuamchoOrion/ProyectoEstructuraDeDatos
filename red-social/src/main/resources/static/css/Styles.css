@@ -182,4 +182,81 @@ h1 {
 }
 .estrella.filled {
     color: gold;
+}/* Estilos para la lista de amigos */
+#contenedorAmigos {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.eliminar-amigo {
+    transition: all 0.3s ease;
+}
+
+.eliminar-amigo:hover {
+    transform: scale(1.1);
+    color: #dc3545 !important;
+}
+/* Estilos para el contenedor de mensajes */
+.contenedor-mensajes {
+    max-width: 100%;
+    overflow: hidden;
+    word-wrap: break-word;
+    white-space: normal;
+    margin-bottom: 10px;
+}
+
+/* Estilos para las tarjetas de contenido */
+.card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Evita que el contenido se salga */
+}
+
+.card-text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Número máximo de líneas */
+    -webkit-box-orient: vertical;
+}
+
+/* Estilos para la sección de información adicional */
+.info-adicional {
+    margin-top: auto; /* Empuja hacia abajo */
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+}
+
+/* Estilos para texto que puede ser muy largo */
+.card-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+/* Estilos para la descripción con scroll */
+.card-text.scrollable {
+    max-height: 100px;
+    overflow-y: auto;
+    -webkit-line-clamp: unset;
+}
+
+/* Estilos para pantallas pequeñas */
+@media (max-width: 768px) {
+    .card-text {
+        -webkit-line-clamp: 2;
+    }
+
+    .info-adicional {
+        font-size: 0.85rem;
+    }
 }

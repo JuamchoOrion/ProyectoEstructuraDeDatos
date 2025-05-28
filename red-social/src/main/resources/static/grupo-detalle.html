@@ -341,13 +341,16 @@
     }
   });
 
-  // Manejar envío de formulario para solicitud de ayuda
   document.getElementById('formSolicitudAyuda').addEventListener('submit', async function(e) {
     e.preventDefault();
 
+    // Obtener la fecha y formatearla correctamente
+    const fechaInput = document.getElementById('fechaNecesidad').value;
+    const fechaNecesidad = fechaInput ? new Date(fechaInput).toISOString() : null;
+
     const solicitud = {
       peticion: document.getElementById('peticion').value,
-      fechaNecesidad: document.getElementById('fechaNecesidad').value,
+      fechaNecesidad: fechaNecesidad, // Usar la fecha formateada
       interes: document.getElementById('interesGrupo').textContent
     };
 

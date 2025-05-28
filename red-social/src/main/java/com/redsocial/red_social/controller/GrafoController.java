@@ -3,6 +3,7 @@ import com.redsocial.red_social.dto.CaminoDTO;
 import com.redsocial.red_social.dto.EstudianteConConexionDTO;
 import com.redsocial.red_social.dto.EstudianteDTO;
 import com.redsocial.red_social.dto.GrafoDTO;
+import com.redsocial.red_social.dto.RecomendacionesMultiNivelDTO;
 import com.redsocial.red_social.model.Estudiante;
 import com.redsocial.red_social.model.RedSocial;
 import com.redsocial.red_social.model.Intereses;
@@ -14,6 +15,7 @@ import com.redsocial.red_social.service.ModeradorService;
 import com.redsocial.red_social.util.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -58,8 +60,35 @@ public class GrafoController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(resultado);
-    }
+    }    @GetMapping(value = "/recomendaciones-multinivel", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<RecomendacionesMultiNivelDTO> obtenerRecomendacionesMultiNivel(
+            @RequestHeader("Authorization") String token) {
 
+        try {
+            String username = jwtUtil.extractUsername(token.replace("Bearer ", ""));
+            Estudiante estudiante = estudianteService.buscarPorUsername(username);
+
+            Map<String, List<Long>> recomendacionesIds = grafoEstudiantes.obtenerRecomendacionesMultiNivel(estudiante.getId());
+
+            List<Estudiante> primerNivelEstudiantes = estudianteRepository.findAllById(recomendacionesIds.get("primerNivel"));
+            List<Estudiante> segundoNivelEstudiantes = estudianteRepository.findAllById(recomendacionesIds.get("segundoNivel"));
+
+            List<EstudianteDTO> primerNivelDTOs = primerNivelEstudiantes.stream()
+                    .map(this::convertirADTO)
+                    .collect(Collectors.toList());
+
+            List<EstudianteDTO> segundoNivelDTOs = segundoNivelEstudiantes.stream()
+                    .map(this::convertirADTO)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(new RecomendacionesMultiNivelDTO(primerNivelDTOs, segundoNivelDTOs));
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
     // Endpoint para encontrar el camino más corto entre dos estudiantes
     @GetMapping("/caminoCorto")
     public ResponseEntity<List<CaminoDTO>> obtenerCaminosMasCortos() {

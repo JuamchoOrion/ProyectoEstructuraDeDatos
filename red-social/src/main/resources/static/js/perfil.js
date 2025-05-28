@@ -30,7 +30,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             showMessage('resultGenerar', error.message, true);
         }
     }
-
+    document.getElementById('cerrarSesion')?.addEventListener('click', () => {
+        localStorage.removeItem('token');
+        window.location.href = 'index.html';
+    });
     window.generarGrupos = generarGrupos;
 
     function getFileIconClass(mimeType, fileName) {
@@ -51,7 +54,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Función para cargar usuarios en el comboBox
     async function cargarUsuariosParaAmigos() {
         try {
-            const response = await fetch("/api/usuario/listar", {
+            const response = await fetch("/api/usuario/listarFiltrados", {
                 headers: { "Authorization": token }
             });
 
@@ -247,6 +250,54 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
             }
         }
+// Función para cargar y mostrar los amigos
+        async function cargarListaAmigos() {
+            const token = localStorage.getItem("token");
+            const contenedor = document.getElementById("contenedorAmigos");
+
+            try {
+                const response = await fetch("/api/usuario/amigos", {
+                    headers: { "Authorization": token }
+                });
+
+                if (!response.ok) {
+                    throw new Error("Error al cargar amigos");
+                }
+
+                const amigos = await response.json();
+
+                if (amigos.length === 0) {
+                    contenedor.innerHTML = "<p class='text-muted'>No tienes amigos agregados todavía.</p>";
+                    return;
+                }
+
+                contenedor.innerHTML = "";
+                amigos.forEach(amigo => {
+                    const amigoDiv = document.createElement("div");
+                    amigoDiv.className = "d-flex justify-content-between align-items-center mb-2 p-2 border rounded";
+                    amigoDiv.innerHTML = `
+                <div>
+                    <span class="fw-bold">${amigo.nombre}</span>
+                </div>
+                <button class="btn btn-sm btn-outline-danger eliminar-amigo" 
+                        data-id="${amigo.id}" 
+                        title="Eliminar amigo">
+                    <i class="fas fa-user-minus"></i>
+                </button>
+            `;
+                    contenedor.appendChild(amigoDiv);
+                });
+
+                // Agregar event listeners a los botones de eliminar
+                document.querySelectorAll('.eliminar-amigo').forEach(btn => {
+                    btn.addEventListener('click', eliminarAmigo);
+                });
+
+            } catch (error) {
+                console.error("Error:", error);
+                contenedor.innerHTML = `<p class="text-danger">Error al cargar amigos: ${error.message}</p>`;
+            }
+        }
 
         async function cargarRecomendaciones() {
             const contenedor = document.getElementById("contenedorRecomendaciones");
@@ -278,10 +329,111 @@ document.addEventListener("DOMContentLoaded", async () => {
                 contenedor.innerHTML = "<p class='text-danger'>Error al cargar recomendaciones.</p>";
             }
         }
+        async function eliminarAmigo(event) {
+            const boton = event.currentTarget;
+            const idAmigo = boton.getAttribute('data-id');
+            const token = localStorage.getItem("token");
 
-        await cargarRecomendaciones();
+            if (!confirm(`¿Estás seguro de que quieres eliminar a este amigo?`)) {
+                return;
+            }
 
-    } catch (error) {
+            try {
+                boton.disabled = true;
+                boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+                const response = await fetch(`/api/usuario/eliminar?idAmigo=${idAmigo}`, {
+                    method: 'DELETE',
+                    headers: { "Authorization": token }
+                });
+
+                if (!response.ok) {
+                    throw new Error(await response.text() || "Error al eliminar amigo");
+                }
+
+                // Recargar la lista después de eliminar
+                await cargarListaAmigos();
+
+            } catch (error) {
+                console.error("Error al eliminar amigo:", error);
+                alert(`Error: ${error.message}`);
+            } finally {
+                boton.disabled = false;
+                boton.innerHTML = '<i class="fas fa-user-minus"></i>';
+            }
+        }
+
+        async function cargarRecomendacionesMultiNivel() {
+            const token = localStorage.getItem("token");
+            const contenedor = document.getElementById("contenedorRecomendaciones");
+
+            try {
+                const response = await fetch("/api/grafo/recomendaciones-multinivel", {
+                    headers: { "Authorization": token }
+                });
+
+                if (!response.ok) {
+                    contenedor.innerHTML = "<p class='text-danger'>No se pudieron cargar las recomendaciones.</p>";
+                    return;
+                }
+
+                const data = await response.json();
+
+                // Limpiar contenedor
+                contenedor.innerHTML = "";
+
+                // Crear sección de primer nivel
+                const primerNivelDiv = document.createElement("div");
+                primerNivelDiv.className = "mb-4";
+                primerNivelDiv.innerHTML = `
+            <h5 class="text-primary"><i class="fas fa-user-friends"></i> Personas que quizas conozcas</h5>
+            ${data.primerNivel.length === 0 ?
+                    '<p class="text-muted">No tienes amigos agregados todavía.</p>' : ''}
+        `;
+
+                data.primerNivel.forEach(est => {
+                    const card = document.createElement("div");
+                    card.className = "border rounded p-2 mb-2 shadow-sm";
+                    card.innerHTML = `
+                <h6><i class="fas fa-user"></i> ${est.username}</h6>
+                <p class="mb-1"><small>${est.email}</small></p>
+                <p class="mb-0"><small><strong>Intereses:</strong> ${est.intereses.join(", ")}</small></p>
+            `;
+                    primerNivelDiv.appendChild(card);
+                });
+                contenedor.appendChild(primerNivelDiv);
+
+                // Crear sección de segundo nivel
+                const segundoNivelDiv = document.createElement("div");
+                segundoNivelDiv.innerHTML = `
+            <h5 class="text-success"><i class="fas fa-user-plus"></i> Perdido en un tema?, ellos tambien :D</h5>
+            ${data.segundoNivel.length === 0 ?
+                    '<p class="text-muted">No hay sugerencias en este momento.</p>' : ''}
+        `;
+
+                data.segundoNivel.forEach(est => {
+                    const card = document.createElement("div");
+                    card.className = "border rounded p-2 mb-2 shadow-sm";
+                    card.innerHTML = `
+                <h6><i class="fas fa-user"></i> ${est.username}</h6>
+                <p class="mb-1"><small>${est.email}</small></p>
+                <p class="mb-0"><small><strong>Intereses:</strong> ${est.intereses.join(", ")}</small></p>
+            `;
+                    segundoNivelDiv.appendChild(card);
+                });
+                contenedor.appendChild(segundoNivelDiv);
+
+            } catch (err) {
+                console.error("Error al cargar recomendaciones:", err);
+                contenedor.innerHTML = "<p class='text-danger'>Error al cargar recomendaciones.</p>";
+            }
+        }
+
+        await cargarRecomendacionesMultiNivel();
+        await cargarListaAmigos();
+    }
+
+    catch (error) {
         console.error("Error en perfil:", error);
         window.location.href = "index.html";
     }
