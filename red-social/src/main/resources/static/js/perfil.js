@@ -215,10 +215,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <p>${contenido.descripcion || 'Sin descripción'}</p>
                         <div class="d-flex justify-content-between">
                             <small>${new Date(contenido.fechaPublicacion).toLocaleString()}</small>
-                            <div>
-                                <span class="badge bg-success">${contenido.likes} <i class="fas fa-thumbs-up"></i></span>
-                                <span class="badge bg-info">${contenido.descargas || 0} <i class="fas fa-download"></i></span>
-                            </div>
                         </div>
                     </div>
                 `;
